@@ -2,7 +2,7 @@
   "name": "translation-file-watcher",
   "displayName": "Translation File Watcher",
   "description": "Watches for translation file changes to automatically perform file conversions.",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "engines": {
     "vscode": "^1.86.0"
   },
