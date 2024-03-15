@@ -9,26 +9,12 @@ import {
 } from './lib/file-lock-manager';
 import { spawn } from 'child_process';
 import path from 'path';
+import fs from 'fs';
 
 let projectRootPath: string | undefined = undefined;
-const poFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
-  vscode.StatusBarAlignment.Left
-);
-poFileWatcherStatusBarItem.text = '$(eye) PO';
-poFileWatcherStatusBarItem.tooltip = 'Watching PO files';
-
-const jsonFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
-  vscode.StatusBarAlignment.Left
-);
-jsonFileWatcherStatusBarItem.text = '$(eye) JSON';
-jsonFileWatcherStatusBarItem.tooltip = 'Watching JSON files';
-
-const codeFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
-  vscode.StatusBarAlignment.Left
-);
-codeFileWatcherStatusBarItem.text = '$(eye) CODE';
-codeFileWatcherStatusBarItem.tooltip = 'Watching code files';
-
+let poFileWatcherStatusBarItem: vscode.StatusBarItem;
+let jsonFileWatcherStatusBarItem: vscode.StatusBarItem;
+let codeFileWatcherStatusBarItem: vscode.StatusBarItem;
 type CallbackOnMatch = (output: string) => void;
 
 function getLastThreeDirectories(
@@ -73,6 +59,22 @@ function extractParts(filePath: string): {
 }
 
 async function findPackageJson(): Promise<string | undefined> {
+  const packageJsonAbsolutePath = getConfig().get<string>(
+    'packageJsonAbsolutePath'
+  );
+
+  if (packageJsonAbsolutePath) {
+    if (!fs.existsSync(packageJsonAbsolutePath)) {
+      vscode.window.showErrorMessage(
+        `The configured absolute json path (${packageJsonAbsolutePath}) does not exist. Please check your configuration.`
+      );
+      deactivate();
+      return;
+    }
+
+    return packageJsonAbsolutePath;
+  }
+
   const files = await vscode.workspace.findFiles('**/package.json');
   if (files.length > 0) {
     return files[0].fsPath;
@@ -257,6 +259,9 @@ async function handleCodeFileChange(uri: vscode.Uri): Promise<void> {
 export async function activate(context: vscode.ExtensionContext) {
   console.log('Activated Translation File Watcher Extension');
 
+  initializeStatusBarIcons();
+  initializeConfigurationWatcher(context);
+
   vscode.window.showInformationMessage(
     'Activated Translation File Watcher Extension.'
   );
@@ -271,10 +276,6 @@ export async function activate(context: vscode.ExtensionContext) {
       )} used as project directory.`,
       7500
     );
-    // Set the root path as the current working directory for subsequent commands
-    // vscode.workspace.updateWorkspaceFolders(0, null, {
-    //   uri: vscode.Uri.file(rootPath),
-    // });
   }
 
   poFileWatcherStatusBarItem.show();
@@ -308,6 +309,43 @@ vscode.commands.registerCommand(
     setMasterLock(!isMasterLockEnabled());
   }
 );
+
+function initializeStatusBarIcons() {
+  // if (!poFileWatcherStatusBarItem) {
+  poFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left
+  );
+  poFileWatcherStatusBarItem.text = '$(eye) PO';
+  poFileWatcherStatusBarItem.tooltip = 'Watching PO files';
+  // }
+  // if (!codeFileWatcherStatusBarItem) {
+  codeFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left
+  );
+  codeFileWatcherStatusBarItem.text = '$(eye) CODE';
+  codeFileWatcherStatusBarItem.tooltip = 'Watching code files';
+
+  // }
+  // if (!jsonFileWatcherStatusBarItem) {
+  jsonFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left
+  );
+  jsonFileWatcherStatusBarItem.text = '$(eye) JSON';
+  jsonFileWatcherStatusBarItem.tooltip = 'Watching JSON files';
+  // }
+}
+
+function initializeConfigurationWatcher(context: vscode.ExtensionContext) {
+  vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration('translationFileWatcher')) {
+      vscode.window.showInformationMessage(
+        'Detected configuration change. Reinitalizing Translation File Watcher extension.'
+      );
+      deactivate();
+      activate(context);
+    }
+  });
+}
 
 export function deactivate() {
   // Dispose of status bar items when the extension is deactivated
