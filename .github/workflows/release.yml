@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Build and Package Extension
         run: |
@@ -20,7 +20,7 @@ jobs:
           # For example:
           # npm install -g vsce
           # vsce package
-          npm run npx vsce package
+          npm run package
 
         # Ensure that the VSIX file is available in the repository root directory
         # working-directory: ./path/to/extension
