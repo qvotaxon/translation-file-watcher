@@ -43,13 +43,13 @@ jobs:
           # Build and package your extension into a VSIX file
           npm run package
 
-      - name: Commit and Push package.json
-        run: |
-          git fetch origin main
-          git checkout main # can be removed after pr
-          git add package.json
-          git commit -m "Update package.json for version bump" package.json
-          git push origin main
+      # - name: Commit and Push package.json
+      #   run: |
+      #     git fetch origin main
+      #     git checkout main # can be removed after pr
+      #     git add package.json
+      #     git commit -m "Update package.json for version bump" package.json
+      #     git push origin main
 
       - name: Fetch Latest VSIX Filename
         id: get_latest_vsix_filename
