@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.6](https://github.com/qvotaxon/translation-file-watcher/compare/v0.1.5-alpha.0...v0.1.6) (2024-03-17)
+
+### 0.1.5 (2024-03-17)
+
+
+### Features
+
+* **dummy:** bumping version with dummy commit ([2dd6251](https://github.com/qvotaxon/translation-file-watcher/commit/2dd6251b1bd1e24ed712d608efec7879762f7d96))
+
 ### [0.1.2-alpha.5](https://github.com/qvotaxon/translation-file-watcher/compare/v0.1.2-alpha.4...v0.1.2-alpha.5) (2024-03-15)
 
 ### [0.1.2-alpha.4](https://github.com/qvotaxon/translation-file-watcher/compare/v0.1.2-alpha.3...v0.1.2-alpha.4) (2024-03-15)
