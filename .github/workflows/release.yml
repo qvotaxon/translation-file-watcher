@@ -52,20 +52,20 @@ jobs:
           git fetch origin release
           git checkout release
 
-      - name: Add New VSIX File
-        run: |
-          # Copy the new VSIX file to the release branch
-          cp ${{ steps.get_latest_vsix_filename.outputs.latest_vsix_filename }} .
+      # - name: Add New VSIX File
+      #   run: |
+      #     # Copy the new VSIX file to the release branch
+      #     git add ${{ steps.get_latest_vsix_filename.outputs.latest_vsix_filename }}
 
-      - name: Remove Older VSIX Files
-        run: |
-          # List VSIX files in the release branch except the latest three
-          vsix_files=$(ls -t1 | grep ".vsix" | tail -n +4)
+      # - name: Remove Older VSIX Files
+      #   run: |
+      #     # List VSIX files in the release branch except the latest three
+      #     vsix_files=$(ls -t1 | grep ".vsix" | tail -n +4)
 
-          # Delete older VSIX files
-          for vsix_file in $vsix_files; do
-            git rm "$vsix_file"
-          done
+      #     # Delete older VSIX files
+      #     for vsix_file in $vsix_files; do
+      #       git rm "$vsix_file"
+      #     done
 
       - name: Commit and Push Changes
         run: |
