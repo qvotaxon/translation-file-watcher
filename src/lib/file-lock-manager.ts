@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
 
+// Random comment to bump version using github actions...
+// Remove...
+
 let masterLock = false;
 let poFilesLocks = 0;
 
