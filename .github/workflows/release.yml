@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-      - feature/create_vsix_release_in_pipeline # TODO: remove in pr.
+      # - feature/create_vsix_release_in_pipeline # TODO: remove in pr.
 
 jobs:
   update_release:
