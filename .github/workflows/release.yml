@@ -70,7 +70,7 @@ jobs:
       - name: Commit and Push Changes
         run: |
           # Commit changes
-          git add .
+          git add '*.vsix' 'CHANGELOG.md' 'LICENSE'
           git commit -m "Add new version and remove older versions of VSIX files"
           git push origin release
 
