@@ -37,6 +37,7 @@ jobs:
 
       - name: Commit and Push package.json
         run: |
+          git checkout main # can be removed after pr
           git add package.json
           git commit -m "Update package.json for version bump" package.json
           git push origin main
