@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - feature/create_vsix_release_in_pipeline # TODO: remove in pr.
+
+jobs:
+  update_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and Package Extension
+        run: |
+          # Build and package your extension into a VSIX file
+          # For example:
+          # npm install -g vsce
+          # vsce package
+          npm run npx vsce package
+
+        # Ensure that the VSIX file is available in the repository root directory
+        # working-directory: ./path/to/extension
+
+      - name: Fetch Latest VSIX Filename
+        id: get_latest_vsix_filename
+        run: |
+          latest_vsix=$(find . -type f -name "*.vsix" -printf "%T@ %p\n" | sort -n | tail -n 1 | cut -f2- -d" ")
+          echo "::set-output name=latest_vsix_filename::$latest_vsix"
+
+      - name: Move to Release Branch
+        run: |
+          # Move to the release branch
+          git checkout release
+
+      - name: Add New VSIX File
+        run: |
+          # Copy the new VSIX file to the release branch
+          cp ${{ steps.get_latest_vsix_filename.outputs.latest_vsix_filename }} .
+
+      - name: Remove Older VSIX Files
+        run: |
+          # List VSIX files in the release branch except the latest three
+          vsix_files=$(ls -t1 | grep ".vsix" | tail -n +4)
+
+          # Delete older VSIX files
+          for vsix_file in $vsix_files; do
+            git rm "$vsix_file"
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          # Commit changes
+          git add .
+          git commit -m "Add new version and remove older versions of VSIX files"
+          git push origin release
+
+          # Switch back to the main branch
+          git checkout main
