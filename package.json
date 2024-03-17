@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/qvotaxon/translation-file-watcher"
   },
-  "version": "0.1.3",
+  "version": "0.1.5",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -50,6 +50,7 @@
     "test": "vscode-test",
     "prepackage": "standard-version",
     "package": "npx vsce package",
+    "postpackage": "git push --follow-tags origin main",
     "prepackage-pre-release": "standard-version --prerelease alpha",
     "package-pre-release": "npx vsce package",
     "transpile-node-modules": "npx babel node_modules/i18next-conv --out-dir node_modules/i18next-conv-dist",
