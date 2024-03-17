@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 // Random comment to bump version using github actions...
 // Remove...
+// another one
 
 let masterLock = false;
 let poFilesLocks = 0;
