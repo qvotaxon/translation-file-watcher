@@ -1,0 +1,104 @@
+name: Release
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+      # - feature/create_vsix_release_in_pipeline # TODO: remove in pr.
+
+jobs:
+  update_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "translation-file-watcher@example.com"
+          git config --global user.name "Translation File Watcher"
+
+      - name: Cache npm packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          # restore-keys: |
+          #   ${{ runner.os }}-npm-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # specify the Node.js version you need
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and Package Extension
+        run: |
+          # Build and package your extension into a VSIX file
+          npm run package
+
+      - name: Upload Changelog
+        uses: actions/upload-artifact@v2
+        with:
+          name: changelog
+          path: CHANGELOG.md
+
+      - name: Upload License
+        uses: actions/upload-artifact@v2
+        with:
+          name: license
+          path: LICENSE
+
+      - name: Fetch Latest VSIX Filename
+        id: get_latest_vsix_filename
+        run: |
+          latest_vsix=$(find . -type f -name "*.vsix" -printf "%T@ %p\n" | sort -n | tail -n 1 | cut -f2- -d" ")
+          echo "::set-output name=latest_vsix_filename::$latest_vsix"
+
+      - name: Move to Release Branch
+        run: |
+          # Move to the release branch
+          # git fetch origin release main
+          git fetch origin release main
+          git checkout release --force
+
+      - name: Download Changelog
+        uses: actions/download-artifact@v2
+        with:
+          name: changelog
+
+      - name: Download License
+        uses: actions/download-artifact@v2
+        with:
+          name: license
+
+      # - name: Add New VSIX File
+      #   run: |
+      #     # Copy the new VSIX file to the release branch
+      #     git add ${{ steps.get_latest_vsix_filename.outputs.latest_vsix_filename }}
+
+      # - name: Remove Older VSIX Files
+      #   run: |
+      #     # List VSIX files in the release branch except the latest three
+      #     vsix_files=$(ls -t1 | grep ".vsix" | tail -n +4)
+
+      #     # Delete older VSIX files
+      #     for vsix_file in $vsix_files; do
+      #       git rm "$vsix_file"
+      #     done
+
+      - name: Commit and Push Changes
+        run: |
+          # Commit changes
+          git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
+          git commit -m "Add new version and remove older versions of VSIX files"
+          git push origin release
+
+          # Switch back to the main branch
+          git checkout main
