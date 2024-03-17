@@ -48,6 +48,8 @@ jobs:
       - name: Move to Release Branch
         run: |
           # Move to the release branch
+          git branch -a
+          git fetch origin release
           git checkout release
 
       - name: Add New VSIX File
