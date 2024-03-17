@@ -64,10 +64,9 @@ jobs:
       - name: Move to Release Branch
         run: |
           # Move to the release branch
-          git branch -a
           # git fetch origin release main
           git fetch origin release main
-          git checkout release
+          git checkout release --force
 
       - name: Download Changelog
         uses: actions/download-artifact@v2
