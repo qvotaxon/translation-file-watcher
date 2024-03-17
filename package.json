@@ -1,0 +1,94 @@
+{
+  "name": "translation-file-watcher",
+  "displayName": "Translation File Watcher",
+  "description": "Watches for translation file changes to automatically perform file conversions.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qvotaxon/translation-file-watcher"
+  },
+  "version": "0.1.2-alpha.5",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "translation-file-watcher.toggleFileWatchers",
+        "title": "Toggle File Watcher Master Lock",
+        "shortTitle": "Toggle Translation File Watcher"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Translation File Watcher",
+      "properties": {
+        "translationFileWatcher.i18nScannerConfigRelativePath": {
+          "type": "string",
+          "default": "i18next-scanner.config.js",
+          "description": "Path relative from root of workspace to i18next-scanner.config.js. Default: i18next-scanner.config.js"
+        },
+        "translationFileWatcher.packageJsonAbsolutePath": {
+          "type": "string",
+          "description": "Absolute path to the package.json of your project. This location will be used as the root for all other commands. When this value is set, this i18nScannerConfigRelativePath will find the i18next-scanner.config.js file relative from this location."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test",
+    "prepackage": "standard-version",
+    "package": "npx vsce package",
+    "prepackage-pre-release": "standard-version --prerelease alpha",
+    "package-pre-release": "npx vsce package",
+    "transpile-node-modules": "npx babel node_modules/i18next-conv --out-dir node_modules/i18next-conv-dist",
+    "precommit": "lint-staged",
+    "disabled-postrelease": "npm run package && git push --follow-tags origin dev"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "i18next-conv": "^14.0.0",
+    "i18next-scanner": "^4.4.0",
+    "i18next-scanner-typescript": "^1.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "@commitlint/cli": "^19.2.0",
+    "@commitlint/config-conventional": "^19.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.86.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "@vscode/test-cli": "^0.0.6",
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "husky": "^9.0.11",
+    "i18n-extract": "^0.6.7",
+    "standard-version": "^9.5.0",
+    "typescript": "^5.3.3"
+  }
+}
