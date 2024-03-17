@@ -16,6 +16,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Configure Git
+        run: |
+          git config --global user.email "translation-file-watcher@example.com"
+          git config --global user.name "Translation File Watcher"
+
       - name: Cache npm packages
         uses: actions/cache@v2
         with:
@@ -30,10 +35,11 @@ jobs:
           node-version: '20' # specify the Node.js version you need
           cache: 'npm'
 
-      - name: Configure Git
+      - name: Commit and Push package.json
         run: |
-          git config --global user.email "translation-file-watcher@example.com"
-          git config --global user.name "Translation File Watcher"
+          git add package.json
+          git commit -m "Update package.json for version bump" package.json
+          git push origin main
 
       - name: Install dependencies
         run: npm install
@@ -41,13 +47,7 @@ jobs:
       - name: Build and Package Extension
         run: |
           # Build and package your extension into a VSIX file
-          # For example:
-          # npm install -g vsce
-          # vsce package
           npm run package
-
-        # Ensure that the VSIX file is available in the repository root directory
-        # working-directory: ./path/to/extension
 
       - name: Fetch Latest VSIX Filename
         id: get_latest_vsix_filename
@@ -60,7 +60,7 @@ jobs:
           # Move to the release branch
           git branch -a
           # git fetch origin release main
-          git fetch origin release
+          git fetch origin release main
           git checkout release
 
       # - name: Add New VSIX File
@@ -81,9 +81,9 @@ jobs:
       - name: Commit and Push Changes
         run: |
           # Commit changes
-          git add '*.vsix' 'LICENSE'
+          git add '*.vsix' 'LICENSE' # CHANGELOG.md
           git commit -m "Add new version and remove older versions of VSIX files"
           git push origin release
 
           # Switch back to the main branch
-          # git checkout main
+          git checkout main
