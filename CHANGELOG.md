@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.1.8 (2024-03-17)
+
+
+### Features
+
+* **dummy:** some awesome feature ([6ec1969](https://github.com/qvotaxon/translation-file-watcher/commit/6ec19692827164645863141b3635d0a3d3dd166f))
+
 ### 0.1.7 (2024-03-17)
 
 
