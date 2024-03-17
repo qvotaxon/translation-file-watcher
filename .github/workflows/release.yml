@@ -43,13 +43,17 @@ jobs:
           # Build and package your extension into a VSIX file
           npm run package
 
-      # - name: Commit and Push package.json
-      #   run: |
-      #     git fetch origin main
-      #     git checkout main # can be removed after pr
-      #     git add package.json
-      #     git commit -m "Update package.json for version bump" package.json
-      #     git push origin main
+      - name: Upload Changelog
+        uses: actions/upload-artifact@v2
+        with:
+          name: changelog
+          path: CHANGELOG.md
+
+      - name: Upload License
+        uses: actions/upload-artifact@v2
+        with:
+          name: license
+          path: LICENSE
 
       - name: Fetch Latest VSIX Filename
         id: get_latest_vsix_filename
@@ -64,6 +68,16 @@ jobs:
           # git fetch origin release main
           git fetch origin release main
           git checkout release
+
+      - name: Download Changelog
+        uses: actions/download-artifact@v2
+        with:
+          name: changelog
+
+      - name: Download License
+        uses: actions/download-artifact@v2
+        with:
+          name: license
 
       # - name: Add New VSIX File
       #   run: |
@@ -83,7 +97,7 @@ jobs:
       - name: Commit and Push Changes
         run: |
           # Commit changes
-          git add '*.vsix' 'LICENSE' # CHANGELOG.md
+          git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
           git commit -m "Add new version and remove older versions of VSIX files"
           git push origin release
 
