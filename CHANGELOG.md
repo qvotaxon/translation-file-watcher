@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.2.0 (2024-03-19)
+
+
+### Features
+
+* release vsix file from pipeline ([#22](https://github.com/qvotaxon/translation-file-watcher/issues/22)) ([89a71cf](https://github.com/qvotaxon/translation-file-watcher/commit/89a71cf1fcd1ab98291e0af08540a84da40180c6))
+
 ### 1.1.1 (2024-03-19)
 
 ## 1.1.0 (2024-03-19)
