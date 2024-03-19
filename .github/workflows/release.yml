@@ -89,7 +89,7 @@ jobs:
           if [ "$file_count" -gt 3 ]; then
             cat sorted_vsix_files.txt | while read line; do
               if ! grep -Fxq "$line" vsix_files_to_keep.txt; then
-                git rm "$line" --cached --ignore-unmatch
+                git rm "$line" --cached
               fi
             done
           else
