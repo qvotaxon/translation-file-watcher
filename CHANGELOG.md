@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.2.2 (2024-03-19)
+
+
+### Bug Fixes
+
+* output of latest version in commit message ([#24](https://github.com/qvotaxon/translation-file-watcher/issues/24)) ([cb7de02](https://github.com/qvotaxon/translation-file-watcher/commit/cb7de02592fb702909d2a56c41d389309d7f0ae3))
+
 ### 1.2.1 (2024-03-19)
 
 ## 1.2.0 (2024-03-19)
