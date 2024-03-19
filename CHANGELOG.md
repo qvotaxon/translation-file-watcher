@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.1.11 (2024-03-19)
+
+
+### Features
+
+* **bump:** version bump using feat ([525beb0](https://github.com/qvotaxon/translation-file-watcher/commit/525beb03a852fad93edb2d27788d1033179b5084))
+
 ### 0.1.10 (2024-03-19)
 
 
