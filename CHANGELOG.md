@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.1.0 (2024-03-19)
+
+
+### Features
+
+* bumping version ([#20](https://github.com/qvotaxon/translation-file-watcher/issues/20)) ([8e43571](https://github.com/qvotaxon/translation-file-watcher/commit/8e43571c9ed18c66004b182c86ea543fa2c9d6dc))
+
 ### 1.0.4 (2024-03-19)
 
 
