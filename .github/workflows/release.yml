@@ -80,24 +80,39 @@ jobs:
       - name: List and Sort .vsix files
         run: |
           ls -1 translation-file-watcher-*.vsix | sort -V > sorted_vsix_files.txt
+          echo "Sorted .vsix files:"
+          cat sorted_vsix_files.txt
 
       - name: Determine versions to keep
         run: |
           tail -n 3 sorted_vsix_files.txt > vsix_files_to_keep.txt
+          echo "Files to keep:"
+          cat vsix_files_to_keep.txt
 
       - name: Remove old .vsix files
         run: |
-          cat sorted_vsix_files.txt | while read line; do
-            if ! grep -Fxq "$line" vsix_files_to_keep.txt; then
-              git rm "$line" --cached --ignore-unmatch
-            fi
-          done
+          file_count=$(wc -l < sorted_vsix_files.txt)
+          if [ "$file_count" -gt 3 ]; then
+            cat sorted_vsix_files.txt | while read line; do
+              if ! grep -Fxq "$line" vsix_files_to_keep.txt; then
+                git rm "$line" --cached --ignore-unmatch
+              fi
+            done
+          else
+            echo "There are 3 or fewer .vsix files. No files will be removed."
+          fi
+
+      - name: Get latest version
+        id: version
+        run: |
+          latest_version=$(tail -n 1 sorted_vsix_files.txt | cut -d'-' -f 3 | cut -d'.' -f 1,2)
+          echo "::set-output name=version::$latest_version"
 
       - name: Commit and Push Changes
         run: |
-          # Commit changes
-          git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
-          git commit -m "Add new version and remove older versions of VSIX files"
+          version=$(echo "${{ steps.version.outputs.version }}")
+          # git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
+          git commit -m "chore(release): release version $version" -a
           git push origin release
 
           # Switch back to the main branch
