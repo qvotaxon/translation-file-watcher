@@ -106,7 +106,10 @@ jobs:
         id: version
         run: |
           latest_version=$(tail -n 1 sorted_vsix_files.txt | cut -d'-' -f 3 | cut -d'.' -f 1,2)
+          testjuh="testjuhvalue"
           echo "{version}={$latest_version}" >> $GITHUB_OUTPUT
+          echo "$latest_version"
+          echo "$testjuh"
 
       - name: Commit and Push Changes
         run: |
