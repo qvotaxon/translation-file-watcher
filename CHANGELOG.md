@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.0.4 (2024-03-19)
+
+
+### Bug Fixes
+
+* pipeline output ([#19](https://github.com/qvotaxon/translation-file-watcher/issues/19)) ([5685eb0](https://github.com/qvotaxon/translation-file-watcher/commit/5685eb09bf0543fd9086ce31086b434c3b522d5c))
+
 ### 1.0.3 (2024-03-19)
 
 
