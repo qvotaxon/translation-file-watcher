@@ -87,8 +87,10 @@ jobs:
 
       - name: Remove old .vsix files
         run: |
-          cat vsix_files_to_keep.txt | while read line; do
-            git rm "$line" --cached --ignore-unmatch
+          cat sorted_vsix_files.txt | while read line; do
+            if ! grep -Fxq "$line" vsix_files_to_keep.txt; then
+              git rm "$line" --cached --ignore-unmatch
+            fi
           done
 
       - name: Commit and Push Changes
