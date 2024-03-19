@@ -112,7 +112,7 @@ jobs:
       - name: Commit and Push Changes
         run: |
           version=$(echo "${{ steps.version.outputs.version }}")
-          # git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
+          git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
           git commit -m "chore(release): release version $version" -a
           git push origin release
 
