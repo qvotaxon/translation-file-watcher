@@ -77,20 +77,19 @@ jobs:
         with:
           name: license
 
-      # - name: Add New VSIX File
-      #   run: |
-      #     # Copy the new VSIX file to the release branch
-      #     git add ${{ steps.get_latest_vsix_filename.outputs.latest_vsix_filename }}
+      - name: List and Sort .vsix files
+        run: |
+          ls -1 translation-file-watcher-*.vsix | sort -V > sorted_vsix_files.txt
 
-      # - name: Remove Older VSIX Files
-      #   run: |
-      #     # List VSIX files in the release branch except the latest three
-      #     vsix_files=$(ls -t1 | grep ".vsix" | tail -n +4)
+      - name: Determine versions to keep
+        run: |
+          tail -n 3 sorted_vsix_files.txt > vsix_files_to_keep.txt
 
-      #     # Delete older VSIX files
-      #     for vsix_file in $vsix_files; do
-      #       git rm "$vsix_file"
-      #     done
+      - name: Remove old .vsix files
+        run: |
+          cat vsix_files_to_keep.txt | while read line; do
+            rm "$line"
+          done
 
       - name: Commit and Push Changes
         run: |
