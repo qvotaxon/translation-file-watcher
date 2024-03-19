@@ -54,12 +54,6 @@ jobs:
           name: license
           path: LICENSE
 
-      - name: Fetch Latest VSIX Filename
-        id: get_latest_vsix_filename
-        run: |
-          latest_vsix=$(find . -type f -name "*.vsix" -printf "%T@ %p\n" | sort -n | tail -n 1 | cut -f2- -d" ")
-          echo "{latest_vsix_filename}={$latest_vsix}" >> $GITHUB_OUTPUT
-
       - name: Move to Release Branch
         run: |
           # Move to the release branch
