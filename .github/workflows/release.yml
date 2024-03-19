@@ -100,7 +100,7 @@ jobs:
         id: version
         run: |
           latest_version=$(tail -n 1 sorted_vsix_files.txt | sed 's/.*-\([0-9]\+\.[0-9]\+\.[0-9]\+\)\.vsix/\1/')
-          echo "{version}={$latest_version}" >> $GITHUB_OUTPUT
+          echo "version=$latest_version" >> $GITHUB_OUTPUT
           echo "Latest version: $latest_version"
 
       - name: Commit and Push Changes
