@@ -24,14 +24,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-npm-
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # specify the Node.js version you need
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -109,7 +107,7 @@ jobs:
         run: |
           version=$(echo "${{ steps.version.outputs.version }}")
           git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
-          git commit -m "chore(release): release version $version" -a
+          git commit -m "chore(release): release version $version"
           git push origin release
 
           # Switch back to the main branch

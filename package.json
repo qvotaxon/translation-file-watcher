@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/qvotaxon/translation-file-watcher"
   },
-  "version": "1.4.2-alpha.7",
+  "version": "1.4.1",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -69,11 +69,9 @@
     ]
   },
   "dependencies": {
-    "@types/sort-json": "^2.0.3",
     "i18next-conv": "^14.0.0",
     "i18next-scanner": "^4.4.0",
-    "i18next-scanner-typescript": "^1.2.0",
-    "sort-json": "^2.0.1"
+    "i18next-scanner-typescript": "^1.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.23.9",
