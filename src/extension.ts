@@ -10,12 +10,23 @@ import {
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+// import sortJson from 'sort-json';
+
+interface JsonObject {
+  [key: string]: any;
+}
 
 let projectRootPath: string | undefined = undefined;
 let poFileWatcherStatusBarItem: vscode.StatusBarItem;
 let jsonFileWatcherStatusBarItem: vscode.StatusBarItem;
 let codeFileWatcherStatusBarItem: vscode.StatusBarItem;
 type CallbackOnMatch = (output: string) => void;
+
+function hasMergeMarkers(filePath: string): boolean {
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  // Check if the file content contains any Git merge markers
+  return /<<<<<<<|=======|>>>>>>>/.test(fileContent);
+}
 
 function getLastThreeDirectories(
   directoryPath: string,
@@ -140,6 +151,48 @@ function executeInBackground(
   });
 }
 
+function sortJsonFile(filePath: string): void {
+  if (hasMergeMarkers(filePath)) {
+    console.error('File contains Git merge markers. Sorting aborted.');
+    return;
+  }
+
+  // Read the JSON data from the file
+  const jsonData = fs.readFileSync(filePath, 'utf-8');
+  const jsonObject: JsonObject = JSON.parse(jsonData);
+
+  // Sort the JSON object
+  const sortedObject = sortJson(jsonObject);
+
+  // Convert the sorted JSON object to a string with indentation of 4 spaces and desired line endings
+  let jsonString = JSON.stringify(sortedObject, null, 4);
+
+  // Add a trailing newline
+  jsonString += '\n';
+
+  // Write the modified JSON string back to the file
+  fs.writeFileSync(filePath, jsonString, 'utf-8');
+}
+
+function sortJson(obj: JsonObject): JsonObject {
+  if (typeof obj !== 'object' || Array.isArray(obj)) {
+    throw new Error('Input must be a JSON object');
+  }
+
+  const sortedObj: JsonObject = {};
+  Object.keys(obj)
+    .sort()
+    .forEach((key) => {
+      const value = obj[key];
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        sortedObj[key] = sortJson(value);
+      } else {
+        sortedObj[key] = value;
+      }
+    });
+  return sortedObj;
+}
+
 async function handlePOFileChange(uri: vscode.Uri): Promise<void> {
   console.log(`Po File Changed: ${uri.fsPath}`);
   poFileWatcherStatusBarItem.text = '$(loading~spin) PO';
@@ -177,6 +230,28 @@ async function handlePOFileChange(uri: vscode.Uri): Promise<void> {
     console.log('Command executed with exit code:', exitCode);
   } catch (error) {
     console.error('Failed to execute command:', error);
+  }
+
+  try {
+    sortJsonFile(jsonOutputPath);
+
+    // const options = { ignoreCase: false, reverse: false, depth: 1 };
+    // const sortJson = await import('sort-json').then((module) => module.default);
+    // sortJson.overwrite(`"${jsonOutputPath}"`, options);
+    // const jsonSortCommand = 'npx';
+    // const jsonSortArgs = [
+    //   'json-sort-cli',
+    //   `"${jsonOutputPath}"`,
+    //   `"${jsonOutputPath}"`,
+    // ];
+    // try {
+    //   const exitCode = await executeInBackground(jsonSortCommand, jsonSortArgs);
+    //   console.log('Command executed with exit code:', exitCode);
+    // } catch (error) {
+    //   console.error('Failed to execute command:', error);
+    // }
+  } catch (error) {
+    console.error('Error loading sort-json:', error);
   }
 }
 
