@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.4.1 (2024-03-20)
+
+
+### Bug Fixes
+
+* make sure we only release vsix files ([#28](https://github.com/qvotaxon/translation-file-watcher/issues/28)) ([84feb91](https://github.com/qvotaxon/translation-file-watcher/commit/84feb912e4c705cb29184b5ce1181fa1cb3915db))
+
 ## 1.4.0 (2024-03-20)
 
 
