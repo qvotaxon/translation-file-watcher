@@ -109,7 +109,7 @@ jobs:
         run: |
           version=$(echo "${{ steps.version.outputs.version }}")
           git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
-          git commit -m "chore(release): release version $version" -a
+          git commit -m "chore(release): release version $version"
           git push origin release
 
           # Switch back to the main branch
