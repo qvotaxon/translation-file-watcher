@@ -24,14 +24,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-npm-
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # specify the Node.js version you need
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
