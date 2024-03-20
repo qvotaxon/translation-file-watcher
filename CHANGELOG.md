@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.4.0 (2024-03-20)
+
+
+### Features
+
+* try fix npm caching ([#27](https://github.com/qvotaxon/translation-file-watcher/issues/27)) ([d830b09](https://github.com/qvotaxon/translation-file-watcher/commit/d830b094591bdbcc06c5bc24edbfdb0578fff61f))
+
 ### 1.3.1 (2024-03-20)
 
 ## 1.3.0 (2024-03-19)
