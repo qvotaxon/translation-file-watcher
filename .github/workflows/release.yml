@@ -89,7 +89,9 @@ jobs:
           if [ "$file_count" -gt 3 ]; then
             cat sorted_vsix_files.txt | while read line; do
               if ! grep -Fxq "$line" vsix_files_to_keep.txt; then
-                git rm "$line" --cached
+                rm "$line"
+                git add "$line"
+                echo "Removing $line"
               fi
             done
           else
