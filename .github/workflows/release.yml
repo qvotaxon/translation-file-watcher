@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - feature/fix_file_removal
 
 jobs:
   update_release:
@@ -90,6 +91,7 @@ jobs:
             cat sorted_vsix_files.txt | while read line; do
               if ! grep -Fxq "$line" vsix_files_to_keep.txt; then
                 git rm "$line" --cached
+                echo "Removing $line"
               fi
             done
           else
