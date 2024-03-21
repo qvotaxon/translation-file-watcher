@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.6.1 (2024-03-21)
+
+
+### Bug Fixes
+
+* code gen button ([#32](https://github.com/qvotaxon/translation-file-watcher/issues/32)) ([6648f16](https://github.com/qvotaxon/translation-file-watcher/commit/6648f168da325a4a6aa3cff4c4b2d5169143b936))
+
 ## 1.6.0 (2024-03-21)
 
 
