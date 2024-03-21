@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/qvotaxon/translation-file-watcher"
   },
-  "version": "1.4.2",
+  "version": "1.5.0-alpha.8",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -23,6 +23,10 @@
         "command": "translation-file-watcher.toggleFileWatchers",
         "title": "Toggle File Watcher Master Lock",
         "shortTitle": "Toggle Translation File Watcher"
+      },
+      {
+        "command": "extension.statusBarItemClicked",
+        "title": "Status Bar Item Clicked"
       }
     ],
     "configuration": {
@@ -37,6 +41,10 @@
         "translationFileWatcher.packageJsonAbsolutePath": {
           "type": "string",
           "description": "Absolute path to the package.json of your project. This location will be used as the root for all other commands. When this value is set, this i18nScannerConfigRelativePath will find the i18next-scanner.config.js file relative from this location."
+        },
+        "translationFileWatcher.localesAbsolutePath": {
+          "type": "string",
+          "description": "Absolute path to the locales directory of your project (the parent directory containing your *.po and *.json files)."
         }
       }
     }

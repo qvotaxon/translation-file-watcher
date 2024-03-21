@@ -10,7 +10,6 @@ import {
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
-// import sortJson from 'sort-json';
 
 interface JsonObject {
   [key: string]: any;
@@ -26,6 +25,15 @@ function hasMergeMarkers(filePath: string): boolean {
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   // Check if the file content contains any Git merge markers
   return /<<<<<<<|=======|>>>>>>>/.test(fileContent);
+}
+
+function checkMergeStatus(): boolean {
+  const mergeHeadPath =
+    vscode.workspace.workspaceFolders![0].uri.fsPath + '/../.git/MERGE_HEAD';
+  return (
+    vscode.workspace.workspaceFolders !== undefined &&
+    fs.existsSync(mergeHeadPath)
+  );
 }
 
 function getLastThreeDirectories(
@@ -152,11 +160,6 @@ function executeInBackground(
 }
 
 function sortJsonFile(filePath: string): void {
-  if (hasMergeMarkers(filePath)) {
-    console.error('File contains Git merge markers. Sorting aborted.');
-    return;
-  }
-
   // Read the JSON data from the file
   const jsonData = fs.readFileSync(filePath, 'utf-8');
   const jsonObject: JsonObject = JSON.parse(jsonData);
@@ -193,8 +196,15 @@ function sortJson(obj: JsonObject): JsonObject {
   return sortedObj;
 }
 
-async function handlePOFileChange(uri: vscode.Uri): Promise<void> {
-  console.log(`Po File Changed: ${uri.fsPath}`);
+async function handlePOFileChange(fsPath: string): Promise<void> {
+  const { jsonOutputPath, locale } = extractParts(fsPath);
+
+  if (hasMergeMarkers(jsonOutputPath) || checkMergeStatus()) {
+    console.error('File contains Git merge markers. Sorting aborted.');
+    return;
+  }
+
+  console.log(`Po File Changed: ${fsPath}`);
   poFileWatcherStatusBarItem.text = '$(loading~spin) PO';
 
   const successMatchSequence = 'file written';
@@ -212,12 +222,11 @@ async function handlePOFileChange(uri: vscode.Uri): Promise<void> {
       }, 2000);
     }, 1000);
   };
-  const { jsonOutputPath, locale } = extractParts(uri.fsPath);
   const command = 'npx';
   const args = [
     'i18next-conv',
     `-l "${locale}"`,
-    `-s "${uri.fsPath}"`,
+    `-s "${fsPath}"`,
     `-t "${jsonOutputPath}"`,
   ];
   try {
@@ -255,9 +264,14 @@ async function handlePOFileChange(uri: vscode.Uri): Promise<void> {
   }
 }
 
-async function handleJsonFileChange(uri: vscode.Uri): Promise<void> {
-  console.log(`Json File Changed: ${uri.fsPath}`);
+async function handleJsonFileChange(fsPath: string): Promise<void> {
+  console.log(`Json File Changed: ${fsPath}`);
   jsonFileWatcherStatusBarItem.text = '$(loading~spin) JSON';
+
+  if (hasMergeMarkers(fsPath) || checkMergeStatus()) {
+    console.error('File contains Git merge markers. Sorting aborted.');
+    return;
+  }
 
   const successMatchSequence = 'file written';
   const successMatchCallback: CallbackOnMatch = () => {
@@ -273,12 +287,12 @@ async function handleJsonFileChange(uri: vscode.Uri): Promise<void> {
       }, 2000);
     }, 1000);
   };
-  const { poOutputPath, locale } = extractParts(uri.fsPath);
+  const { poOutputPath, locale } = extractParts(fsPath);
   const command = 'npx';
   const args = [
     'i18next-conv',
     `-l "${locale}"`,
-    `-s "${uri.fsPath}"`,
+    `-s "${fsPath}"`,
     `-t "${poOutputPath}"`,
   ];
 
@@ -303,8 +317,13 @@ async function handleJsonFileChange(uri: vscode.Uri): Promise<void> {
   }
 }
 
-async function handleCodeFileChange(uri: vscode.Uri): Promise<void> {
-  console.log(`Code File (**​/*.{ts,tsx}) Changed: ${uri.fsPath}`);
+async function handleCodeFileChange(fsPath: string): Promise<void> {
+  if (checkMergeStatus()) {
+    console.error('File contains Git merge markers. Sorting aborted.');
+    return;
+  }
+
+  console.log(`Code File (**​/*.{ts,tsx}) Changed: ${fsPath}`);
   codeFileWatcherStatusBarItem.text = '$(loading~spin) CODE';
 
   const i18nScannerConfigRelativePath = getConfig().get<string>(
@@ -329,6 +348,40 @@ async function handleCodeFileChange(uri: vscode.Uri): Promise<void> {
   } catch (error) {
     console.error('Failed to execute command:', error);
   }
+}
+
+function processPOFiles(
+  directory: string,
+  callback: (filePath: string) => void
+) {
+  fs.readdirSync(directory).forEach((file) => {
+    const filePath = path.join(directory, file);
+    const stat = fs.statSync(filePath);
+    if (stat.isDirectory()) {
+      // Recursively search subdirectories
+      processPOFiles(filePath, callback);
+    } else if (file.endsWith('.po')) {
+      // Call the callback function for *.po files
+      callback(filePath);
+    }
+  });
+}
+
+function processJSONFiles(
+  directory: string,
+  callback: (filePath: string) => void
+) {
+  fs.readdirSync(directory).forEach((file) => {
+    const filePath = path.join(directory, file);
+    const stat = fs.statSync(filePath);
+    if (stat.isDirectory()) {
+      // Recursively search subdirectories
+      processJSONFiles(filePath, callback);
+    } else if (file.endsWith('.json')) {
+      // Call the callback function for *.json files
+      callback(filePath);
+    }
+  });
 }
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -356,6 +409,45 @@ export async function activate(context: vscode.ExtensionContext) {
   poFileWatcherStatusBarItem.show();
   jsonFileWatcherStatusBarItem.show();
   codeFileWatcherStatusBarItem.show();
+
+  /**
+   * TODO> Move to seperate function
+   */
+  const localesAbsolutePath = getConfig().get<string>('localesAbsolutePath');
+  if (localesAbsolutePath) {
+    let poFileWatcherStatusBarItemClickedCommand =
+      vscode.commands.registerCommand(
+        'extension.poFileWatcherStatusBarItemClicked',
+        () => {
+          processJSONFiles(localesAbsolutePath, handleJsonFileChange);
+          vscode.window.showInformationMessage('Generating PO files.');
+        }
+      );
+
+    poFileWatcherStatusBarItem.command =
+      'extension.poFileWatcherStatusBarItemClicked';
+
+    let jsonFileWatcherStatusBarItemClickedCommand =
+      vscode.commands.registerCommand(
+        'extension.jsonFileWatcherStatusBarItemClicked',
+        () => {
+          processPOFiles(localesAbsolutePath, handlePOFileChange);
+          vscode.window.showInformationMessage('Generating JSON files.');
+        }
+      );
+
+    jsonFileWatcherStatusBarItem.command =
+      'extension.jsonFileWatcherStatusBarItemClicked';
+
+    context.subscriptions.push(
+      poFileWatcherStatusBarItemClickedCommand,
+      jsonFileWatcherStatusBarItemClickedCommand
+    );
+  } else {
+    vscode.window.showErrorMessage(
+      'Please configure a locales path in the extension settings.'
+    );
+  }
 
   const poFileWatcher = createFileWatcher(
     '**/locales/**/*.po',
@@ -391,7 +483,8 @@ function initializeStatusBarIcons() {
     vscode.StatusBarAlignment.Left
   );
   poFileWatcherStatusBarItem.text = '$(eye) PO';
-  poFileWatcherStatusBarItem.tooltip = 'Watching PO files';
+  poFileWatcherStatusBarItem.tooltip =
+    'Watching PO files (click to generate PO files)';
   // }
   // if (!codeFileWatcherStatusBarItem) {
   codeFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
@@ -406,7 +499,8 @@ function initializeStatusBarIcons() {
     vscode.StatusBarAlignment.Left
   );
   jsonFileWatcherStatusBarItem.text = '$(eye) JSON';
-  jsonFileWatcherStatusBarItem.tooltip = 'Watching JSON files';
+  jsonFileWatcherStatusBarItem.tooltip =
+    'Watching JSON files (click to generate JSON files)';
   // }
 }
 
