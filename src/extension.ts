@@ -266,12 +266,22 @@ async function handlePOFileChange(fsPath: string): Promise<void> {
 
 async function handleJsonFileChange(fsPath: string): Promise<void> {
   console.log(`Json File Changed: ${fsPath}`);
-  jsonFileWatcherStatusBarItem.text = '$(loading~spin) JSON';
+
+  const generatePo = getConfig().get<boolean>('generatePo', true);
+
+  if (!generatePo) {
+    console.error(
+      'Po file generation is disabled by extension settings. Skipping.'
+    );
+    return;
+  }
 
   if (hasMergeMarkers(fsPath) || checkMergeStatus()) {
     console.error('File contains Git merge markers. Sorting aborted.');
     return;
   }
+
+  jsonFileWatcherStatusBarItem.text = '$(loading~spin) JSON';
 
   const successMatchSequence = 'file written';
   const successMatchCallback: CallbackOnMatch = () => {
@@ -317,13 +327,20 @@ async function handleJsonFileChange(fsPath: string): Promise<void> {
   }
 }
 
-async function handleCodeFileChange(fsPath: string): Promise<void> {
+async function handleCodeFileChange(
+  fsPath: string | undefined = undefined
+): Promise<void> {
   if (checkMergeStatus()) {
     console.error('File contains Git merge markers. Sorting aborted.');
     return;
   }
 
-  console.log(`Code File (**​/*.{ts,tsx}) Changed: ${fsPath}`);
+  if (fsPath) {
+    console.log(`Code File (**​/*.{ts,tsx}) Changed: ${fsPath}`);
+  } else {
+    console.log(`Manual code change trigger received.`);
+  }
+
   codeFileWatcherStatusBarItem.text = '$(loading~spin) CODE';
 
   const i18nScannerConfigRelativePath = getConfig().get<string>(
@@ -439,9 +456,22 @@ export async function activate(context: vscode.ExtensionContext) {
     jsonFileWatcherStatusBarItem.command =
       'extension.jsonFileWatcherStatusBarItemClicked';
 
+    let codeFileWatcherStatusBarItemClickedCommand =
+      vscode.commands.registerCommand(
+        'extension.codeFileWatcherStatusBarItemClicked',
+        () => {
+          handleCodeFileChange(),
+            vscode.window.showInformationMessage('Generating JSON files.');
+        }
+      );
+
+    codeFileWatcherStatusBarItem.command =
+      'extension.codeFileWatcherStatusBarItemClickedCommand';
+
     context.subscriptions.push(
       poFileWatcherStatusBarItemClickedCommand,
-      jsonFileWatcherStatusBarItemClickedCommand
+      jsonFileWatcherStatusBarItemClickedCommand,
+      codeFileWatcherStatusBarItemClickedCommand
     );
   } else {
     vscode.window.showErrorMessage(
@@ -467,6 +497,12 @@ export async function activate(context: vscode.ExtensionContext) {
     isMasterLockEnabled
   );
 
+  const defaultFileLockOnBoot = getConfig().get<boolean>(
+    'defaultFileLockOnBoot',
+    false
+  );
+  setMasterLock(defaultFileLockOnBoot);
+
   context.subscriptions.push(poFileWatcher, codeFileWatcher, jsonFileWatcher);
 }
 
@@ -491,7 +527,8 @@ function initializeStatusBarIcons() {
     vscode.StatusBarAlignment.Left
   );
   codeFileWatcherStatusBarItem.text = '$(eye) CODE';
-  codeFileWatcherStatusBarItem.tooltip = 'Watching code files';
+  codeFileWatcherStatusBarItem.tooltip =
+    'Watching code files (click to generate JSON files)';
 
   // }
   // if (!jsonFileWatcherStatusBarItem) {
