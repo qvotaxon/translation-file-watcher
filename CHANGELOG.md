@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.5.0 (2024-03-21)
+
+
+### Features
+
+* handle merge state correctly ([#30](https://github.com/qvotaxon/translation-file-watcher/issues/30)) ([a89bf9a](https://github.com/qvotaxon/translation-file-watcher/commit/a89bf9abb726d0e4338afa643a583a60183491ee))
+
 ## [1.5.0-alpha.8](https://github.com/qvotaxon/translation-file-watcher/compare/v1.5.0-alpha.7...v1.5.0-alpha.8) (2024-03-21)
 
 ## [1.5.0-alpha.7](https://github.com/qvotaxon/translation-file-watcher/compare/v1.5.0-alpha.6...v1.5.0-alpha.7) (2024-03-21)
