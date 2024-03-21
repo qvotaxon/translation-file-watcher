@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.6.0 (2024-03-21)
+
+
+### Features
+
+* add configurable options ([#31](https://github.com/qvotaxon/translation-file-watcher/issues/31)) ([f1ade60](https://github.com/qvotaxon/translation-file-watcher/commit/f1ade60234c502d2317bebf1f5d8db28dc38f453))
+
 ## 1.5.0 (2024-03-21)
 
 
