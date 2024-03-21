@@ -466,7 +466,7 @@ export async function activate(context: vscode.ExtensionContext) {
       );
 
     codeFileWatcherStatusBarItem.command =
-      'extension.codeFileWatcherStatusBarItemClickedCommand';
+      'extension.codeFileWatcherStatusBarItemClicked';
 
     context.subscriptions.push(
       poFileWatcherStatusBarItemClickedCommand,
