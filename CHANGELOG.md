@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0-alpha.6](https://github.com/qvotaxon/translation-file-watcher/compare/v1.5.0-alpha.5...v1.5.0-alpha.6) (2024-03-21)
+
 ## [1.5.0-alpha.5](https://github.com/qvotaxon/translation-file-watcher/compare/v1.5.0-alpha.4...v1.5.0-alpha.5) (2024-03-21)
 
 ## [1.5.0-alpha.4](https://github.com/qvotaxon/translation-file-watcher/compare/v1.5.0-alpha.3...v1.5.0-alpha.4) (2024-03-21)
