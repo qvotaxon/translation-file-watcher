@@ -2,11 +2,15 @@
   "name": "translation-file-watcher",
   "displayName": "Translation File Watcher",
   "description": "Watches for translation file changes to automatically perform file conversions.",
+  "publisher": "qvotaxon",
+  "configuration": {
+    "schema": "./schema.json"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/qvotaxon/translation-file-watcher"
   },
-  "version": "1.6.0",
+  "version": "1.7.0-alpha.0",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -28,36 +32,7 @@
         "command": "extension.statusBarItemClicked",
         "title": "Status Bar Item Clicked"
       }
-    ],
-    "configuration": {
-      "type": "object",
-      "title": "Translation File Watcher",
-      "properties": {
-        "translationFileWatcher.i18nScannerConfigRelativePath": {
-          "type": "string",
-          "default": "i18next-scanner.config.js",
-          "description": "Path relative from root of workspace to i18next-scanner.config.js. Default: i18next-scanner.config.js"
-        },
-        "translationFileWatcher.packageJsonAbsolutePath": {
-          "type": "string",
-          "description": "Absolute path to the package.json of your project. This location will be used as the root for all other commands. When this value is set, this i18nScannerConfigRelativePath will find the i18next-scanner.config.js file relative from this location."
-        },
-        "translationFileWatcher.localesAbsolutePath": {
-          "type": "string",
-          "description": "Absolute path to the locales directory of your project (the parent directory containing your *.po and *.json files)."
-        },
-        "translationFileWatcher.defaultFileLockOnBoot": {
-          "type": "boolean",
-          "default": false,
-          "description": "Choose whether you would like the file watcher to be enabled at boot time. Or whether you would rather have to enable the file watcher manually each time."
-        },
-        "translationFileWatcher.generatePo": {
-          "type": "boolean",
-          "default": true,
-          "description": "Since it's possible that for your use case, you only need json files, it's possible to disable the po file generation using this setting."
-        }
-      }
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

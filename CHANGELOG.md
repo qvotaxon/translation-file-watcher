@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0-alpha.0](https://github.com/qvotaxon/translation-file-watcher/compare/v0.1.9...v1.7.0-alpha.0) (2024-03-21)
+
+
+### Features
+
+* add configurable options ([#31](https://github.com/qvotaxon/translation-file-watcher/issues/31)) ([f1ade60](https://github.com/qvotaxon/translation-file-watcher/commit/f1ade60234c502d2317bebf1f5d8db28dc38f453))
+* bumping version ([#20](https://github.com/qvotaxon/translation-file-watcher/issues/20)) ([8e43571](https://github.com/qvotaxon/translation-file-watcher/commit/8e43571c9ed18c66004b182c86ea543fa2c9d6dc))
+* **bump:** version bump using feat ([525beb0](https://github.com/qvotaxon/translation-file-watcher/commit/525beb03a852fad93edb2d27788d1033179b5084))
+* **bump:** version bump using feat ([b333eb8](https://github.com/qvotaxon/translation-file-watcher/commit/b333eb8ab0ac4d33f5afed96bd606ae90cd24fb7))
+* clear changelog ([6e3e04a](https://github.com/qvotaxon/translation-file-watcher/commit/6e3e04a3b474f23c3e372bff956aaa5795489285))
+* fix things ([#25](https://github.com/qvotaxon/translation-file-watcher/issues/25)) ([8b1b2b0](https://github.com/qvotaxon/translation-file-watcher/commit/8b1b2b074633edea7a22c5c793f4d3fac3d70e05))
+* handle merge state correctly ([#30](https://github.com/qvotaxon/translation-file-watcher/issues/30)) ([a89bf9a](https://github.com/qvotaxon/translation-file-watcher/commit/a89bf9abb726d0e4338afa643a583a60183491ee))
+* release vsix file from pipeline ([#22](https://github.com/qvotaxon/translation-file-watcher/issues/22)) ([89a71cf](https://github.com/qvotaxon/translation-file-watcher/commit/89a71cf1fcd1ab98291e0af08540a84da40180c6))
+* try fix npm caching ([#27](https://github.com/qvotaxon/translation-file-watcher/issues/27)) ([d830b09](https://github.com/qvotaxon/translation-file-watcher/commit/d830b094591bdbcc06c5bc24edbfdb0578fff61f))
+
+
+### Bug Fixes
+
+* code gen button ([993190c](https://github.com/qvotaxon/translation-file-watcher/commit/993190cf10d8349d9f0bf2c22880428df81528c4))
+* make sure we only release vsix files ([#28](https://github.com/qvotaxon/translation-file-watcher/issues/28)) ([84feb91](https://github.com/qvotaxon/translation-file-watcher/commit/84feb912e4c705cb29184b5ce1181fa1cb3915db))
+* output of latest version in commit message ([#24](https://github.com/qvotaxon/translation-file-watcher/issues/24)) ([cb7de02](https://github.com/qvotaxon/translation-file-watcher/commit/cb7de02592fb702909d2a56c41d389309d7f0ae3))
+* pipeline output ([#19](https://github.com/qvotaxon/translation-file-watcher/issues/19)) ([5685eb0](https://github.com/qvotaxon/translation-file-watcher/commit/5685eb09bf0543fd9086ce31086b434c3b522d5c))
+* replace deprecated use of set-output ([#18](https://github.com/qvotaxon/translation-file-watcher/issues/18)) ([59713aa](https://github.com/qvotaxon/translation-file-watcher/commit/59713aac9e12f4c55b6c18cc4031f8e7282f2eb9))
+
 ## 1.6.0 (2024-03-21)
 
 
