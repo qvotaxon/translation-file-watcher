@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.7.1 (2024-03-22)
+
+
+### Bug Fixes
+
+* config ([#34](https://github.com/qvotaxon/translation-file-watcher/issues/34)) ([d1b0b6f](https://github.com/qvotaxon/translation-file-watcher/commit/d1b0b6f15c4a26f8defbdfc9c945669c43502191))
+
 ## 1.7.0 (2024-03-22)
 
 ## [1.7.0-alpha.2](https://github.com/qvotaxon/translation-file-watcher/compare/v1.7.0-alpha.1...v1.7.0-alpha.2) (2024-03-22)
