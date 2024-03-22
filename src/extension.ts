@@ -11,6 +11,17 @@ import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
+enum FileMode {
+  Manual = 'manual',
+  Automatic = 'automatic',
+}
+
+enum FileType {
+  Json = 'json',
+  Po = 'po',
+  Code = 'code',
+}
+
 interface JsonObject {
   [key: string]: any;
 }
@@ -20,6 +31,59 @@ let poFileWatcherStatusBarItem: vscode.StatusBarItem;
 let jsonFileWatcherStatusBarItem: vscode.StatusBarItem;
 let codeFileWatcherStatusBarItem: vscode.StatusBarItem;
 type CallbackOnMatch = (output: string) => void;
+
+function isFileModeManual(fileType: FileType) {
+  const overallFileMode = getConfig().get<FileMode>(
+    'fileModes.overallFileMode',
+    FileMode.Automatic
+  );
+  const poFileMode = getConfig().get<FileMode>(
+    'fileModes.poFileMode',
+    FileMode.Automatic
+  );
+  const jsonFileMode = getConfig().get<FileMode>(
+    'fileModes.jsonFileMode',
+    FileMode.Automatic
+  );
+  const codeFileMode = getConfig().get<FileMode>(
+    'fileModes.codeFileMode',
+    FileMode.Automatic
+  );
+
+  switch (fileType) {
+    case FileType.Po:
+      return (
+        overallFileMode === FileMode.Manual || poFileMode === FileMode.Manual
+      );
+    case FileType.Json:
+      return (
+        overallFileMode === FileMode.Manual || jsonFileMode === FileMode.Manual
+      );
+    case FileType.Code:
+      return (
+        overallFileMode === FileMode.Manual || codeFileMode === FileMode.Manual
+      );
+  }
+}
+
+// Function to update synchronized options
+async function updateSynchronizedOptions(value: string) {
+  await getConfig().update(
+    'fileModes.poFileMode',
+    value,
+    vscode.ConfigurationTarget.Global
+  );
+  await getConfig().update(
+    'fileModes.jsonFileMode',
+    value,
+    vscode.ConfigurationTarget.Global
+  );
+  await getConfig().update(
+    'fileModes.codeFileMode',
+    value,
+    vscode.ConfigurationTarget.Global
+  );
+}
 
 function hasMergeMarkers(filePath: string): boolean {
   const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -99,6 +163,19 @@ async function findPackageJson(): Promise<string | undefined> {
     return files[0].fsPath;
   }
   return undefined;
+}
+
+function showRestartMessage() {
+  vscode.window
+    .showInformationMessage(
+      'Settings have been updated. Please restart the extension for the changes to take effect.',
+      'Restart'
+    )
+    .then((action) => {
+      if (action === 'Restart') {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+      }
+    });
 }
 
 /**
@@ -199,6 +276,11 @@ function sortJson(obj: JsonObject): JsonObject {
 async function handlePOFileChange(fsPath: string): Promise<void> {
   const { jsonOutputPath, locale } = extractParts(fsPath);
 
+  if (isFileModeManual(FileType.Po)) {
+    console.info('Manual mode enabled for Po files. Skipping.');
+    return;
+  }
+
   if (hasMergeMarkers(jsonOutputPath) || checkMergeStatus()) {
     console.error('File contains Git merge markers. Sorting aborted.');
     return;
@@ -269,9 +351,9 @@ async function handleJsonFileChange(fsPath: string): Promise<void> {
 
   const generatePo = getConfig().get<boolean>('generatePo', true);
 
-  if (!generatePo) {
-    console.error(
-      'Po file generation is disabled by extension settings. Skipping.'
+  if (!generatePo || isFileModeManual(FileType.Json)) {
+    console.info(
+      'Either manual mode is enabled for Po files or Po file generation is disabled. Skipping.'
     );
     return;
   }
@@ -330,6 +412,11 @@ async function handleJsonFileChange(fsPath: string): Promise<void> {
 async function handleCodeFileChange(
   fsPath: string | undefined = undefined
 ): Promise<void> {
+  if (isFileModeManual(FileType.Code)) {
+    console.info('Manual mode enabled for Po files. Skipping.');
+    return;
+  }
+
   if (checkMergeStatus()) {
     console.error('File contains Git merge markers. Sorting aborted.');
     return;
@@ -401,11 +488,44 @@ function processJSONFiles(
   });
 }
 
+function notifyRequiredSettings() {
+  vscode.window
+    .showInformationMessage(
+      'Please configure the extension settings to use the extension properly.',
+      'Open Configuration'
+    )
+    .then((choice) => {
+      if (choice === 'Open Configuration') {
+        vscode.commands.executeCommand(
+          'workbench.action.openSettings',
+          '@ext:qvotaxon.translation-file-watcher'
+        );
+      }
+    });
+}
+
 export async function activate(context: vscode.ExtensionContext) {
   console.log('Activated Translation File Watcher Extension');
 
+  const myExtension = vscode.extensions.getExtension(
+    'qvotaxon.translation-file-watcher'
+  );
+  const currentVersion =
+    myExtension!.packageJSON.configurationVersion ?? '0.0.1';
+
+  const lastVersion = context.globalState.get(
+    'TranslationFileWatcherExtensionVersion'
+  );
+  if (currentVersion !== lastVersion) {
+    void context.globalState.update(
+      'TranslationFileWatcherExtensionVersion',
+      currentVersion
+    );
+    notifyRequiredSettings();
+  }
+
   initializeStatusBarIcons();
-  initializeConfigurationWatcher(context);
+  await initializeConfigurationWatcher(context);
 
   vscode.window.showInformationMessage(
     'Activated Translation File Watcher Extension.'
@@ -497,12 +617,6 @@ export async function activate(context: vscode.ExtensionContext) {
     isMasterLockEnabled
   );
 
-  const defaultFileLockOnBoot = getConfig().get<boolean>(
-    'defaultFileLockOnBoot',
-    false
-  );
-  setMasterLock(defaultFileLockOnBoot);
-
   context.subscriptions.push(poFileWatcher, codeFileWatcher, jsonFileWatcher);
 }
 
@@ -541,14 +655,29 @@ function initializeStatusBarIcons() {
   // }
 }
 
-function initializeConfigurationWatcher(context: vscode.ExtensionContext) {
-  vscode.workspace.onDidChangeConfiguration((event) => {
-    if (event.affectsConfiguration('translationFileWatcher')) {
-      vscode.window.showInformationMessage(
-        'Detected configuration change. Reinitalizing Translation File Watcher extension.'
+async function initializeConfigurationWatcher(
+  context: vscode.ExtensionContext
+) {
+  vscode.workspace.onDidChangeConfiguration(async (event) => {
+    if (
+      event.affectsConfiguration(
+        'translationFileWatcher.fileModes.overallFileMode'
+      )
+    ) {
+      const newValue = getConfig().get<string>(
+        'fileModes.overallFileMode',
+        'automatic'
       );
-      deactivate();
-      activate(context);
+      await updateSynchronizedOptions(newValue);
+    }
+
+    if (event.affectsConfiguration('translationFileWatcher')) {
+      // vscode.window.showInformationMessage(
+      //   'Detected configuration change. Reinitalizing Translation File Watcher extension.'
+      // );
+      showRestartMessage();
+      // deactivate();
+      // activate(context);
     }
   });
 }
