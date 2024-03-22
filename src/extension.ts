@@ -67,10 +67,22 @@ function isFileModeManual(fileType: FileType) {
 }
 
 // Function to update synchronized options
-function updateSynchronizedOptions(value: string) {
-  getConfig().update('fileModes.poFileMode', value);
-  getConfig().update('fileModes.jsonFileMode', value);
-  getConfig().update('fileModes.codeFileMode', value);
+async function updateSynchronizedOptions(value: string) {
+  await getConfig().update(
+    'fileModes.poFileMode',
+    value,
+    vscode.ConfigurationTarget.Global
+  );
+  await getConfig().update(
+    'fileModes.jsonFileMode',
+    value,
+    vscode.ConfigurationTarget.Global
+  );
+  await getConfig().update(
+    'fileModes.codeFileMode',
+    value,
+    vscode.ConfigurationTarget.Global
+  );
 }
 
 function hasMergeMarkers(filePath: string): boolean {
@@ -151,6 +163,19 @@ async function findPackageJson(): Promise<string | undefined> {
     return files[0].fsPath;
   }
   return undefined;
+}
+
+function showRestartMessage() {
+  vscode.window
+    .showInformationMessage(
+      'Settings have been updated. Please restart the extension for the changes to take effect.',
+      'Restart'
+    )
+    .then((action) => {
+      if (action === 'Restart') {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+      }
+    });
 }
 
 /**
@@ -485,7 +510,8 @@ export async function activate(context: vscode.ExtensionContext) {
   const myExtension = vscode.extensions.getExtension(
     'qvotaxon.translation-file-watcher'
   );
-  const currentVersion = myExtension!.packageJSON.version ?? '1.0.0';
+  const currentVersion =
+    myExtension!.packageJSON.configurationVersion ?? '0.0.1';
 
   const lastVersion = context.globalState.get(
     'TranslationFileWatcherExtensionVersion'
@@ -499,7 +525,7 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   initializeStatusBarIcons();
-  initializeConfigurationWatcher(context);
+  await initializeConfigurationWatcher(context);
 
   vscode.window.showInformationMessage(
     'Activated Translation File Watcher Extension.'
@@ -629,19 +655,29 @@ function initializeStatusBarIcons() {
   // }
 }
 
-function initializeConfigurationWatcher(context: vscode.ExtensionContext) {
-  vscode.workspace.onDidChangeConfiguration((event) => {
-    if (event.affectsConfiguration('translationFileWatcher')) {
-      vscode.window.showInformationMessage(
-        'Detected configuration change. Reinitalizing Translation File Watcher extension.'
+async function initializeConfigurationWatcher(
+  context: vscode.ExtensionContext
+) {
+  vscode.workspace.onDidChangeConfiguration(async (event) => {
+    if (
+      event.affectsConfiguration(
+        'translationFileWatcher.fileModes.overallFileMode'
+      )
+    ) {
+      const newValue = getConfig().get<string>(
+        'fileModes.overallFileMode',
+        'automatic'
       );
-      deactivate();
-      activate(context);
+      await updateSynchronizedOptions(newValue);
     }
 
-    if (event.affectsConfiguration('translationFileWatcher.overallFileMode')) {
-      const newValue = getConfig().get<string>('overallFileMode', 'automatic');
-      updateSynchronizedOptions(newValue);
+    if (event.affectsConfiguration('translationFileWatcher')) {
+      // vscode.window.showInformationMessage(
+      //   'Detected configuration change. Reinitalizing Translation File Watcher extension.'
+      // );
+      showRestartMessage();
+      // deactivate();
+      // activate(context);
     }
   });
 }

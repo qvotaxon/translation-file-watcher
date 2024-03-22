@@ -8,6 +8,7 @@
     "url": "https://github.com/qvotaxon/translation-file-watcher"
   },
   "version": "1.7.0-alpha.2",
+  "configurationVersion": "0.0.1",
   "engines": {
     "vscode": "^1.86.0"
   },
