@@ -273,10 +273,13 @@ function sortJson(obj: JsonObject): JsonObject {
   return sortedObj;
 }
 
-async function handlePOFileChange(fsPath: string): Promise<void> {
+async function handlePOFileChange(
+  fsPath: string,
+  triggeredByFileWatcher: boolean = true
+): Promise<void> {
   const { jsonOutputPath, locale } = extractParts(fsPath);
 
-  if (isFileModeManual(FileType.Po)) {
+  if (isFileModeManual(FileType.Po) && triggeredByFileWatcher) {
     console.info('Manual mode enabled for Po files. Skipping.');
     return;
   }
@@ -346,12 +349,21 @@ async function handlePOFileChange(fsPath: string): Promise<void> {
   }
 }
 
-async function handleJsonFileChange(fsPath: string): Promise<void> {
+async function handleJsonFileChange(
+  fsPath: string,
+  triggeredByFileWatcher: boolean = true
+): Promise<void> {
   console.log(`Json File Changed: ${fsPath}`);
 
-  const generatePo = getConfig().get<boolean>('generatePo', true);
+  const generatePo = getConfig().get<boolean>(
+    'fileGeneration.generatePo',
+    true
+  );
 
-  if (!generatePo || isFileModeManual(FileType.Json)) {
+  if (
+    !generatePo ||
+    (isFileModeManual(FileType.Json) && triggeredByFileWatcher)
+  ) {
     console.info(
       'Either manual mode is enabled for Po files or Po file generation is disabled. Skipping.'
     );
@@ -410,9 +422,10 @@ async function handleJsonFileChange(fsPath: string): Promise<void> {
 }
 
 async function handleCodeFileChange(
-  fsPath: string | undefined = undefined
+  fsPath: string | undefined = undefined,
+  triggeredByFileWatcher: boolean = true
 ): Promise<void> {
-  if (isFileModeManual(FileType.Code)) {
+  if (isFileModeManual(FileType.Code) && triggeredByFileWatcher) {
     console.info('Manual mode enabled for Po files. Skipping.');
     return;
   }
@@ -456,34 +469,36 @@ async function handleCodeFileChange(
 
 function processPOFiles(
   directory: string,
-  callback: (filePath: string) => void
+  triggeredByFileWatcher: boolean,
+  callback: (filePath: string, triggeredByFileWatcher: boolean) => void
 ) {
   fs.readdirSync(directory).forEach((file) => {
     const filePath = path.join(directory, file);
     const stat = fs.statSync(filePath);
     if (stat.isDirectory()) {
       // Recursively search subdirectories
-      processPOFiles(filePath, callback);
+      processPOFiles(filePath, triggeredByFileWatcher, callback);
     } else if (file.endsWith('.po')) {
       // Call the callback function for *.po files
-      callback(filePath);
+      callback(filePath, triggeredByFileWatcher);
     }
   });
 }
 
 function processJSONFiles(
   directory: string,
-  callback: (filePath: string) => void
+  triggeredByFileWatcher: boolean,
+  callback: (filePath: string, triggeredByFileWatcher: boolean) => void
 ) {
   fs.readdirSync(directory).forEach((file) => {
     const filePath = path.join(directory, file);
     const stat = fs.statSync(filePath);
     if (stat.isDirectory()) {
       // Recursively search subdirectories
-      processJSONFiles(filePath, callback);
+      processJSONFiles(filePath, triggeredByFileWatcher, callback);
     } else if (file.endsWith('.json')) {
       // Call the callback function for *.json files
-      callback(filePath);
+      callback(filePath, triggeredByFileWatcher);
     }
   });
 }
@@ -556,7 +571,7 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.poFileWatcherStatusBarItemClicked',
         () => {
-          processJSONFiles(localesAbsolutePath, handleJsonFileChange);
+          processJSONFiles(localesAbsolutePath, false, handleJsonFileChange);
           vscode.window.showInformationMessage('Generating PO files.');
         }
       );
@@ -568,7 +583,7 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.jsonFileWatcherStatusBarItemClicked',
         () => {
-          processPOFiles(localesAbsolutePath, handlePOFileChange);
+          processPOFiles(localesAbsolutePath, false, handlePOFileChange);
           vscode.window.showInformationMessage('Generating JSON files.');
         }
       );
@@ -580,7 +595,7 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.codeFileWatcherStatusBarItemClicked',
         () => {
-          handleCodeFileChange(),
+          handleCodeFileChange(undefined, false),
             vscode.window.showInformationMessage('Generating JSON files.');
         }
       );
