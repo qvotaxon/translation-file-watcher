@@ -4,7 +4,7 @@
 ![Visual Studio Code](https://img.shields.io/badge/VS%20Code-^1.61.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Downloads](https://img.shields.io/visual-studio-marketplace/d/qvotaxon.translation-file-watcher.svg)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/qvotaxon/translation-file-watcher/release)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/qvotaxon/translation-file-watcher/release.yml?branch=main)
 ![Open Issues](https://img.shields.io/github/issues/qvotaxon/translation-file-watcher)
 ![Closed Issues](https://img.shields.io/github/issues-closed/qvotaxon/translation-file-watcher)
 ![Contributors](https://img.shields.io/github/contributors/qvotaxon/translation-file-watcher)
