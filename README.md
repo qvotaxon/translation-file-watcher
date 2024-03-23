@@ -1,4 +1,5 @@
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
+![Logo](./logo.jpg)
+<small>Generated using CoPilot</small>
 
 ![Version](https://vsmarketplacebadge.apphb.com/version-short/qvotaxon.translation-file-watcher.svg)
 ![Installs](https://vsmarketplacebadge.apphb.com/installs-short/qvotaxon.translation-file-watcher.svg)
