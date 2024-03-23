@@ -143,6 +143,11 @@ export async function handleJsonFileChange(
   }
   statusBarManager.setStatusBarItemText(TaskBarItemType.PO, '$(sync~spin) PO');
 
+  const cancelCallback = () => {
+    console.log('Removing file lock because task was cancelled.');
+    removePoFileLock();
+  };
+
   const successMatchSequence = 'file written';
   const successMatchCallback: CallbackOnMatch = () => {
     console.log(`Match found while loocking for ${successMatchSequence}`);
@@ -172,7 +177,8 @@ export async function handleJsonFileChange(
       command,
       args,
       successMatchSequence,
-      successMatchCallback
+      successMatchCallback,
+      cancelCallback
     );
 
     if (exitCode === 0) {
