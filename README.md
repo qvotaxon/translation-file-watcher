@@ -1,9 +1,6 @@
 ![Logo](./logo.jpg)
 <small>Generated using CoPilot</small>
 
-![Version](https://vsmarketplacebadge.apphb.com/version-short/qvotaxon.translation-file-watcher.svg)
-![Installs](https://vsmarketplacebadge.apphb.com/installs-short/qvotaxon.translation-file-watcher.svg)
-![Rating](https://vsmarketplacebadge.apphb.com/rating-short/qvotaxon.translation-file-watcher.svg)
 ![Visual Studio Code](https://img.shields.io/badge/VS%20Code-^1.61.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Downloads](https://img.shields.io/visual-studio-marketplace/d/qvotaxon.translation-file-watcher.svg)
@@ -27,8 +24,6 @@ TODO:
 ## Screenshots
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
-## Features
 
 ## Features
 
