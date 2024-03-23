@@ -87,16 +87,7 @@ export async function handlePOFileChange(
   const successMatchCallback: CallbackOnMatch = () => {
     console.log(`Match found while loocking for ${successMatchSequence}`);
 
-    statusBarManager.setStatusBarItemText(
-      TaskBarItemType.JSON,
-      '$(check) JSON'
-    );
-    setTimeout(() => {
-      statusBarManager.setStatusBarItemText(
-        TaskBarItemType.JSON,
-        '$(eye) JSON'
-      );
-    }, 2000);
+    statusBarManager.setStatusBarItemText(TaskBarItemType.JSON, '$(eye) JSON');
   };
   const command = 'npx';
   const args = [
@@ -156,10 +147,7 @@ export async function handleJsonFileChange(
   const successMatchCallback: CallbackOnMatch = () => {
     console.log(`Match found while loocking for ${successMatchSequence}`);
 
-    statusBarManager.setStatusBarItemText(TaskBarItemType.PO, '$(check) PO');
-    setTimeout(() => {
-      statusBarManager.setStatusBarItemText(TaskBarItemType.PO, '$(eye) PO');
-    }, 2000);
+    statusBarManager.setStatusBarItemText(TaskBarItemType.PO, '$(eye) PO');
     setTimeout(() => {
       // TODO: This callback should only be called when writing to the po file is done.
       // So the json file watcher shouldn't be triggered, but it is...
@@ -237,14 +225,8 @@ export async function handleCodeFileChange(
   try {
     const exitCode = await executeInBackground(command, args);
 
-    statusBarManager.setStatusBarItemText(
-      TaskBarItemType.JSON,
-      '$(check) JSON'
-    );
-    // setTimeout(() => {
     statusBarManager.setStatusBarItemText(TaskBarItemType.JSON, '$(eye) JSON');
     statusBarManager.setStatusBarItemText(TaskBarItemType.CODE, '$(eye) CODE');
-    // }, 2000);
 
     console.log('Command executed with exit code:', exitCode);
   } catch (error) {
