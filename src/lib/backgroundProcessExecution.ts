@@ -1,13 +1,13 @@
 import { spawn } from 'child_process';
 import { CallbackOnMatch } from './Types';
-import { findPackageJson } from './fileManagement';
+import { getPackageJsonAbsolutePath } from './fileManagement';
 import path from 'path';
 
 let projectRootPath: string | undefined = undefined;
 
 async function getProjectRootPath(): Promise<string> {
   if (!projectRootPath) {
-    const packageJsonPath = await findPackageJson();
+    const packageJsonPath = await getPackageJsonAbsolutePath();
 
     projectRootPath = path.dirname(packageJsonPath!);
   }
