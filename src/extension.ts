@@ -18,7 +18,10 @@ import {
   handlePOFileChange,
   handleCodeFileChange,
 } from './lib/fileHandling';
-import { findPackageJson, getLastThreeDirectories } from './lib/fileManagement';
+import {
+  getPackageJsonAbsolutePath,
+  getLastThreeDirectories,
+} from './lib/fileManagement';
 import {
   notifyRequiredSettings,
   initializeStatusBarItems,
@@ -56,7 +59,7 @@ export async function activate(context: vscode.ExtensionContext) {
     'Activated Translation File Watcher Extension.'
   );
 
-  const packageJsonPath = await findPackageJson();
+  const packageJsonPath = await getPackageJsonAbsolutePath();
   if (packageJsonPath) {
     vscode.window.setStatusBarMessage(
       `TFW: ${getLastThreeDirectories(
@@ -91,8 +94,14 @@ export async function activate(context: vscode.ExtensionContext) {
   /**
    * TODO> Move to seperate function
    */
-  const localesAbsolutePath = getConfig().get<string>('localesAbsolutePath');
-  if (localesAbsolutePath) {
+  let localesRelativePath = getConfig().get<string>(
+    'filePaths.localesRelativePath'
+  );
+  if (localesRelativePath) {
+    const localesAbsolutePath = `${
+      vscode.workspace.workspaceFolders![0].uri.fsPath
+    }\\${localesRelativePath}`;
+
     let poFileWatcherStatusBarItemClickedCommand =
       vscode.commands.registerCommand(
         'extension.poFileWatcherStatusBarItemClicked',
