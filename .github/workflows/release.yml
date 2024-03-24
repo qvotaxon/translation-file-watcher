@@ -106,9 +106,13 @@ jobs:
       - name: Commit and Push Changes
         run: |
           version=$(echo "${{ steps.version.outputs.version }}")
-          git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
-          git commit -m "chore(release): release version $version"
-          git push origin release
+          if [ -n "$(git diff --exit-code)" ]; then
+            git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
+            git commit -m "chore(release): release version $version"
+            git push origin release
+          else
+            echo "No changes to commit."
+          fi
 
           # Switch back to the main branch
           git checkout main
