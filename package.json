@@ -28,15 +28,15 @@
           "translationFileWatcher.filePaths.i18nScannerConfigRelativePath": {
             "type": "string",
             "default": "i18next-scanner.config.js",
-            "description": "Path relative from root of workspace to i18next-scanner.config.js. Default: i18next-scanner.config.js"
+            "description": "Path relative from the root of the workspace to the i18n-next scanner configuration file (i18next-scanner.config.js)."
           },
           "translationFileWatcher.filePaths.packageJsonAbsolutePath": {
             "type": "string",
-            "description": "Absolute path to the package.json of your project. This location will be used as the root for all other commands. When this value is set, this i18nScannerConfigRelativePath will find the i18next-scanner.config.js file relative from this location."
+            "description": "Absolute path to the project's package.json file. This location serves as the root for all other commands and configurations."
           },
           "translationFileWatcher.filePaths.localesAbsolutePath": {
             "type": "string",
-            "description": "Absolute path to the locales directory of your project (the parent directory containing your *.po and *.json files)."
+            "description": "Absolute path to the project's localization directory (the parent directory containing *.po and *.json files)."
           }
         }
       },
@@ -47,7 +47,7 @@
           "translationFileWatcher.fileGeneration.generatePo": {
             "type": "boolean",
             "default": true,
-            "description": "Since it's possible that for your use case, you only need json files, it's possible to disable the po file generation using this setting."
+            "description": "Enable/disable generation of .po files from .json files. Useful for projects not requiring .po files."
           }
         }
       },
@@ -67,7 +67,7 @@
               "Manual",
               "Automatic"
             ],
-            "description": "Choose whether you would like the file watcher to be enabled at boot time (Automatic) or whether you would rather have to enable the file watcher manually each time (Manual)."
+            "description": "Choose whether to enable file watchers (Automatic) or click icons on the status bar icons Manual) to start file conversions and key extraction."
           },
           "translationFileWatcher.fileModes.poFileMode": {
             "type": "string",
@@ -80,7 +80,7 @@
               "Manual",
               "Automatic"
             ],
-            "description": "Choose the mode for PO files."
+            "description": "Choose the mode for .po files: automatic generation using file watchers or manual generation by clicking icons on the status bar."
           },
           "translationFileWatcher.fileModes.jsonFileMode": {
             "type": "string",
@@ -93,7 +93,7 @@
               "Manual",
               "Automatic"
             ],
-            "description": "Choose the mode for JSON files."
+            "description": "Choose the mode for .json files: automatic generation using file watchers or manual generation by clicking icons on the status bar."
           },
           "translationFileWatcher.fileModes.codeFileMode": {
             "type": "string",
@@ -106,7 +106,7 @@
               "Manual",
               "Automatic"
             ],
-            "description": "Choose the mode for Code files."
+            "description": "Choose the mode for code files: automatic extraction of translation keys and updating of .json files using file watchers or manual extraction and update by clicking icons on the status bar."
           }
         }
       }
