@@ -21,7 +21,7 @@ jobs:
           git config --global user.name "Translation File Watcher"
 
       - name: Cache npm packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
@@ -41,13 +41,13 @@ jobs:
           npm run package
 
       - name: Upload Changelog
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: changelog
           path: CHANGELOG.md
 
       - name: Upload License
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: license
           path: LICENSE
@@ -60,12 +60,12 @@ jobs:
           git checkout release --force
 
       - name: Download Changelog
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: changelog
 
       - name: Download License
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: license
 
