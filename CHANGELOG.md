@@ -2,12 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### 1.7.3 (2024-03-24)
+### 1.7.3 (2024-03-26)
 
 
 ### Bug Fixes
 
-* bump version ([#45](https://github.com/qvotaxon/translation-file-watcher/issues/45)) ([2b42de0](https://github.com/qvotaxon/translation-file-watcher/commit/2b42de07cef17a2178aab529b223c28c097c5d8c))
+* status bar icons ([#46](https://github.com/qvotaxon/translation-file-watcher/issues/46)) ([c75772f](https://github.com/qvotaxon/translation-file-watcher/commit/c75772f602dfa448fd7c1570a6d5c5c5ba0b303c))
 
 ### 1.7.1 (2024-03-22)
 
