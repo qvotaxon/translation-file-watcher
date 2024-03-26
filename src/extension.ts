@@ -39,7 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
     'qvotaxon.translation-file-watcher'
   );
   const currentVersion =
-    myExtension!.packageJSON.configurationVersion ?? '0.0.1';
+    myExtension!.packageJSON.configurationVersion ?? '0.0.2';
 
   const lastVersion = context.globalState.get(
     'TranslationFileWatcherExtensionVersion'
