@@ -80,12 +80,17 @@ export function extractParts(filePath: string): {
   return { jsonOutputPath, poOutputPath, locale };
 }
 
-export async function findPackageJson(): Promise<string | undefined> {
-  const packageJsonAbsolutePath = getConfig().get<string>(
-    'packageJsonAbsolutePath'
+export async function getPackageJsonAbsolutePath(): Promise<
+  string | undefined
+> {
+  const packageJsonRelativePath = getConfig().get<string>(
+    'filePaths.packageJsonRelativePath'
   );
+  const packageJsonAbsolutePath = `${
+    vscode.workspace.workspaceFolders![0].uri.fsPath
+  }\\${packageJsonRelativePath}`;
 
-  if (packageJsonAbsolutePath) {
+  if (packageJsonRelativePath) {
     if (!fs.existsSync(packageJsonAbsolutePath)) {
       return undefined;
     }

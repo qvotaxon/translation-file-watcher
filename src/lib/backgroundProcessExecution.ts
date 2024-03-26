@@ -8,7 +8,7 @@ let projectRootPath: string | undefined = undefined;
 
 async function getProjectRootPath(): Promise<string> {
   if (!projectRootPath) {
-    const packageJsonPath = await findPackageJson();
+    const packageJsonPath = await getPackageJsonAbsolutePath();
 
     projectRootPath = path.dirname(packageJsonPath!);
   }

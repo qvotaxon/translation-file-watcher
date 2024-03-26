@@ -7,8 +7,8 @@
     "type": "git",
     "url": "https://github.com/qvotaxon/translation-file-watcher"
   },
-  "version": "1.7.2-alpha.0",
-  "configurationVersion": "0.0.1",
+  "version": "1.7.4",
+  "configurationVersion": "0.0.2",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -30,13 +30,13 @@
             "default": "i18next-scanner.config.js",
             "description": "Path relative from the root of the workspace to the i18n-next scanner configuration file (i18next-scanner.config.js)."
           },
-          "translationFileWatcher.filePaths.packageJsonAbsolutePath": {
+          "translationFileWatcher.filePaths.packageJsonRelativePath": {
             "type": "string",
-            "description": "Absolute path to the project's package.json file. This location serves as the root for all other commands and configurations."
+            "description": "Relative path to the project's package.json file. This location serves as the root for all other commands and configurations."
           },
-          "translationFileWatcher.filePaths.localesAbsolutePath": {
+          "translationFileWatcher.filePaths.localesRelativePath": {
             "type": "string",
-            "description": "Absolute path to the project's localization directory (the parent directory containing *.po and *.json files)."
+            "description": "Relative path to the project's localization directory (the parent directory containing *.po and *.json files)."
           }
         }
       },
@@ -67,7 +67,7 @@
               "Manual",
               "Automatic"
             ],
-            "description": "Choose whether to enable file watchers (Automatic) or click icons on the status bar icons Manual) to start file conversions and key extraction."
+            "description": "Choose whether to enable file watchers (Automatic) or click icons on the status bar icons (Manual) to start file conversions and key extraction."
           },
           "translationFileWatcher.fileModes.poFileMode": {
             "type": "string",
@@ -80,7 +80,7 @@
               "Manual",
               "Automatic"
             ],
-            "description": "Choose the mode for .po files: automatic generation using file watchers or manual generation by clicking icons on the status bar."
+            "description": "Choose the mode for .po files: Automatic will generate the PO When your Json File is changed. Manual generation is triggered by clicking icons on the status bar."
           },
           "translationFileWatcher.fileModes.jsonFileMode": {
             "type": "string",
@@ -93,7 +93,7 @@
               "Manual",
               "Automatic"
             ],
-            "description": "Choose the mode for .json files: automatic generation using file watchers or manual generation by clicking icons on the status bar."
+            "description": "Choose the mode for .Json files: Automatic will generate the Json When your PO File is changed. Manual generation is triggered by clicking icons on the status bar."
           },
           "translationFileWatcher.fileModes.codeFileMode": {
             "type": "string",
@@ -132,6 +132,7 @@
     "test": "vscode-test",
     "prepackage": "standard-version",
     "package": "npx vsce package",
+    "postpackage": "git push --follow-tags origin main",
     "prealpha-package": "standard-version --prerelease alpha --skip.changelog=true --skip.tag=true",
     "alpha-package": "npx vsce package",
     "transpile-node-modules": "npx babel node_modules/i18next-conv --out-dir node_modules/i18next-conv-dist",
