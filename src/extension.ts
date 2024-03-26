@@ -68,28 +68,52 @@ export async function activate(context: vscode.ExtensionContext) {
       )} used as project directory.`,
       7500
     );
-  } else {
-    vscode.window.showErrorMessage(
-      `The configured absolute json path could not be found. Please check your configuration.`
+
+    statusBarManager.setStatusBarItemCommand(
+      StatusBarItemType.PO,
+      'extension.poFileWatcherStatusBarItemClicked'
     );
-    deactivate();
+    statusBarManager.setStatusBarItemCommand(
+      StatusBarItemType.JSON,
+      'extension.jsonFileWatcherStatusBarItemClicked'
+    );
+    statusBarManager.setStatusBarItemCommand(
+      StatusBarItemType.CODE,
+      'extension.codeFileWatcherStatusBarItemClicked'
+    );
+  } else {
+    // vscode.window.showErrorMessage(
+    //   `The configured absolute json path could not be found. Please check your configuration.`
+    // );
+    statusBarManager.setStatusBarItemText(
+      StatusBarItemType.PO,
+      '$(eye-closed) JSON'
+    );
+    statusBarManager.setStatusBarItemTooltip(
+      StatusBarItemType.PO,
+      'File watcher disabled because required configuration files could not be found.'
+    );
+    statusBarManager.setStatusBarItemText(
+      StatusBarItemType.JSON,
+      '$(eye-closed) JSON'
+    );
+    statusBarManager.setStatusBarItemTooltip(
+      StatusBarItemType.JSON,
+      'File watcher disabled because required configuration files could not be found.'
+    );
+    statusBarManager.setStatusBarItemText(
+      StatusBarItemType.CODE,
+      '$(eye-closed) JSON'
+    );
+    statusBarManager.setStatusBarItemTooltip(
+      StatusBarItemType.CODE,
+      'File watcher disabled because required configuration files could not be found.'
+    );
   }
 
   statusBarManager.showStatusBarItem(StatusBarItemType.PO);
-  statusBarManager.setStatusBarItemCommand(
-    StatusBarItemType.PO,
-    'extension.poFileWatcherStatusBarItemClicked'
-  );
   statusBarManager.showStatusBarItem(StatusBarItemType.JSON);
-  statusBarManager.setStatusBarItemCommand(
-    StatusBarItemType.PO,
-    'extension.jsonFileWatcherStatusBarItemClicked'
-  );
   statusBarManager.showStatusBarItem(StatusBarItemType.CODE);
-  statusBarManager.setStatusBarItemCommand(
-    StatusBarItemType.PO,
-    'extension.codeFileWatcherStatusBarItemClicked'
-  );
 
   /**
    * TODO> Move to seperate function
@@ -97,7 +121,7 @@ export async function activate(context: vscode.ExtensionContext) {
   let localesRelativePath = getConfig().get<string>(
     'filePaths.localesRelativePath'
   );
-  if (localesRelativePath) {
+  if (localesRelativePath && packageJsonPath) {
     const localesAbsolutePath = `${
       vscode.workspace.workspaceFolders![0].uri.fsPath
     }\\${localesRelativePath}`;
@@ -134,11 +158,12 @@ export async function activate(context: vscode.ExtensionContext) {
       jsonFileWatcherStatusBarItemClickedCommand,
       codeFileWatcherStatusBarItemClickedCommand
     );
-  } else {
-    vscode.window.showErrorMessage(
-      'Please configure a locales path in the extension settings.'
-    );
   }
+  // else {
+  //   vscode.window.showErrorMessage(
+  //     'Please configure a locales path in the extension settings.'
+  //   );
+  // }
 
   const poFileWatcher = createFileWatcher(
     '**/locales/**/*.po',
