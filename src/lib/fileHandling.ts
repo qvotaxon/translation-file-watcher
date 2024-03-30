@@ -8,7 +8,11 @@ import {
 } from './fileManagement';
 import path from 'path';
 import { getConfig } from './configurationManagement';
-import { removePoFileLock, addPoFilesLock } from './file-lock-manager';
+import {
+  removePoFileLock,
+  addPoFilesLock,
+  isPoFileLocked,
+} from './file-lock-manager';
 import { FileType, LogVerbosity, TaskBarItemType } from './Enums';
 import { executeInBackground } from './backgroundProcessExecution';
 import { CallbackOnMatch } from './Types';
@@ -67,6 +71,11 @@ export async function handlePOFileChange(
 ): Promise<void> {
   const statusBarManager = StatusBarManager.getInstance();
   const { jsonOutputPath, locale } = extractParts(fsPath);
+
+  if (isPoFileLocked(locale)) {
+    OutputChannelLogger.appendLine(`Po file ${locale} locked. Skipping.`);
+    return;
+  }
 
   if (isFileModeManual(FileType.Po) && triggeredByFileWatcher) {
     OutputChannelLogger.appendLine(
@@ -161,13 +170,16 @@ export async function handleJsonFileChange(
     );
     return;
   }
+
+  const { poOutputPath, locale } = extractParts(fsPath);
+
   statusBarManager.setStatusBarItemText(TaskBarItemType.PO, '$(sync~spin) PO');
 
   const cancelCallback = () => {
     OutputChannelLogger.appendLine(
       'Removing file lock because task was cancelled.'
     );
-    removePoFileLock();
+    removePoFileLock(locale);
   };
 
   const successMatchSequence = 'file written';
@@ -181,10 +193,9 @@ export async function handleJsonFileChange(
       // TODO: This callback should only be called when writing to the po file is done.
       // So the json file watcher shouldn't be triggered, but it is...
       // As a workaround we wait for one second after the task is finished.
-      removePoFileLock();
+      removePoFileLock(locale);
     }, 250);
   };
-  const { poOutputPath, locale } = extractParts(fsPath);
   const command = 'npx';
   const args = [
     'i18next-conv',
@@ -194,7 +205,7 @@ export async function handleJsonFileChange(
   ];
 
   //TODO: error handling?
-  addPoFilesLock();
+  addPoFilesLock(locale);
 
   try {
     const { stdout, stderr, exitCode } = await executeInBackground(
