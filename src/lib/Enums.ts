@@ -14,3 +14,9 @@ export enum TaskBarItemType {
   JSON,
   CODE,
 }
+
+// Enum for log types
+export enum LogVerbosity {
+  Verbose,
+  Important,
+}
