@@ -43,20 +43,6 @@ export function hasMergeMarkers(filePath: string): boolean {
   return /<<<<<<<|=======|>>>>>>>/.test(fileContent);
 }
 
-export function getLastThreeDirectories(
-  directoryPath: string,
-  maxLength = 200
-): string {
-  const pathComponents = directoryPath.split(/[\\/]/).filter(Boolean);
-  const lastThreePaths = pathComponents.slice(-3).join('/');
-
-  if (lastThreePaths.length > maxLength) {
-    return directoryPath;
-  } else {
-    return lastThreePaths;
-  }
-}
-
 export function extractParts(filePath: string): {
   jsonOutputPath: string;
   poOutputPath: string;
@@ -80,7 +66,7 @@ export function extractParts(filePath: string): {
   return { jsonOutputPath, poOutputPath, locale };
 }
 
-export async function getPackageJsonAbsolutePath(): Promise<
+export async function getPackageJsonRelativePath(): Promise<
   string | undefined
 > {
   const packageJsonRelativePath = getConfig().get<string>(

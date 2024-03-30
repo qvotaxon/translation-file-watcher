@@ -9,10 +9,11 @@ import {
 import path from 'path';
 import { getConfig } from './configurationManagement';
 import { removePoFileLock, addPoFilesLock } from './file-lock-manager';
-import { FileType, TaskBarItemType } from './Enums';
+import { FileType, LogVerbosity, TaskBarItemType } from './Enums';
 import { executeInBackground } from './backgroundProcessExecution';
 import { CallbackOnMatch } from './Types';
 import { StatusBarManager } from './StatusBarManager';
+import { OutputChannelLogger } from './OutputChannelLogger';
 
 export function checkMergeStatus(): boolean {
   const mergeHeadPath =
@@ -68,16 +69,21 @@ export async function handlePOFileChange(
   const { jsonOutputPath, locale } = extractParts(fsPath);
 
   if (isFileModeManual(FileType.Po) && triggeredByFileWatcher) {
-    console.info('Manual mode enabled for Po files. Skipping.');
+    OutputChannelLogger.appendLine(
+      'Manual mode enabled for Po files. Skipping.'
+    );
     return;
   }
 
   if (hasMergeMarkers(jsonOutputPath) || checkMergeStatus()) {
-    console.error('File contains Git merge markers. Sorting aborted.');
+    OutputChannelLogger.appendLine(
+      'File contains Git merge markers. Sorting aborted.',
+      LogVerbosity.Important
+    );
     return;
   }
 
-  console.log(`Po File Changed: ${fsPath}`);
+  OutputChannelLogger.appendLine(`Po File Changed: ${fsPath}`);
   statusBarManager.setStatusBarItemText(
     TaskBarItemType.JSON,
     '$(sync~spin) JSON'
@@ -85,7 +91,9 @@ export async function handlePOFileChange(
 
   const successMatchSequence = 'file written';
   const successMatchCallback: CallbackOnMatch = () => {
-    console.log(`Match found while loocking for ${successMatchSequence}`);
+    OutputChannelLogger.appendLine(
+      `Match found while loocking for ${successMatchSequence}`
+    );
 
     statusBarManager.setStatusBarItemText(TaskBarItemType.JSON, '$(eye) JSON');
   };
@@ -103,15 +111,24 @@ export async function handlePOFileChange(
       successMatchSequence,
       successMatchCallback
     );
-    console.log('Command executed with exit code:', exitCode);
+    OutputChannelLogger.appendLine(
+      `Command executed with exit code: ${exitCode}`,
+      LogVerbosity.Important
+    );
   } catch (error) {
-    console.error('Failed to execute command:', error);
+    OutputChannelLogger.appendLine(
+      `Failed to execute command: ${error}`,
+      LogVerbosity.Important
+    );
   }
 
   try {
     sortJsonFile(jsonOutputPath);
   } catch (error) {
-    console.error('Error loading sort-json:', error);
+    OutputChannelLogger.appendLine(
+      `Error loading sort-json: ${error}`,
+      LogVerbosity.Important
+    );
   }
 }
 
@@ -120,7 +137,7 @@ export async function handleJsonFileChange(
   triggeredByFileWatcher: boolean = true
 ): Promise<void> {
   const statusBarManager = StatusBarManager.getInstance();
-  console.log(`Json File Changed: ${fsPath}`);
+  OutputChannelLogger.appendLine(`Json File Changed: ${fsPath}`);
 
   const generatePo = getConfig().get<boolean>(
     'fileGeneration.generatePo',
@@ -131,21 +148,33 @@ export async function handleJsonFileChange(
     !generatePo ||
     (isFileModeManual(FileType.Json) && triggeredByFileWatcher)
   ) {
-    console.info(
+    OutputChannelLogger.appendLine(
       'Either manual mode is enabled for Po files or Po file generation is disabled. Skipping.'
     );
     return;
   }
 
   if (hasMergeMarkers(fsPath) || checkMergeStatus()) {
-    console.error('File contains Git merge markers. Sorting aborted.');
+    OutputChannelLogger.appendLine(
+      'File contains Git merge markers. Sorting aborted.',
+      LogVerbosity.Important
+    );
     return;
   }
   statusBarManager.setStatusBarItemText(TaskBarItemType.PO, '$(sync~spin) PO');
 
+  const cancelCallback = () => {
+    OutputChannelLogger.appendLine(
+      'Removing file lock because task was cancelled.'
+    );
+    removePoFileLock();
+  };
+
   const successMatchSequence = 'file written';
   const successMatchCallback: CallbackOnMatch = () => {
-    console.log(`Match found while loocking for ${successMatchSequence}`);
+    OutputChannelLogger.appendLine(
+      `Match found while loocking for ${successMatchSequence}`
+    );
 
     statusBarManager.setStatusBarItemText(TaskBarItemType.PO, '$(eye) PO');
     setTimeout(() => {
@@ -172,16 +201,20 @@ export async function handleJsonFileChange(
       command,
       args,
       successMatchSequence,
-      successMatchCallback
+      successMatchCallback,
+      cancelCallback
     );
 
     if (exitCode === 0) {
-      console.log(stdout);
+      OutputChannelLogger.appendLine(stdout);
     } else {
-      console.error(stderr);
+      OutputChannelLogger.appendLine(stderr, LogVerbosity.Important);
     }
   } catch (error) {
-    console.error('Failed to execute command:', error);
+    OutputChannelLogger.appendLine(
+      `Failed to execute command: ${error}`,
+      LogVerbosity.Important
+    );
   }
 }
 
@@ -191,19 +224,26 @@ export async function handleCodeFileChange(
 ): Promise<void> {
   const statusBarManager = StatusBarManager.getInstance();
   if (isFileModeManual(FileType.Code) && triggeredByFileWatcher) {
-    console.info('Manual mode enabled for Po files. Skipping.');
+    OutputChannelLogger.appendLine(
+      'Manual mode enabled for Po files. Skipping.'
+    );
     return;
   }
 
   if (checkMergeStatus()) {
-    console.error('File contains Git merge markers. Sorting aborted.');
+    OutputChannelLogger.appendLine(
+      'File contains Git merge markers. Sorting aborted.',
+      LogVerbosity.Important
+    );
     return;
   }
 
   if (fsPath) {
-    console.log(`Code File (**​/*.{ts,tsx}) Changed: ${fsPath}`);
+    OutputChannelLogger.appendLine(
+      `Code File (**​/*.{ts,tsx}) Changed: ${fsPath}`
+    );
   } else {
-    console.log(`Manual code change trigger received.`);
+    OutputChannelLogger.appendLine(`Manual code change trigger received.`);
   }
 
   statusBarManager.setStatusBarItemText(
@@ -228,9 +268,14 @@ export async function handleCodeFileChange(
     statusBarManager.setStatusBarItemText(TaskBarItemType.JSON, '$(eye) JSON');
     statusBarManager.setStatusBarItemText(TaskBarItemType.CODE, '$(eye) CODE');
 
-    console.log('Command executed with exit code:', exitCode);
+    OutputChannelLogger.appendLine(
+      `Command executed with exit code: ${exitCode}`
+    );
   } catch (error) {
-    console.error('Failed to execute command:', error);
+    OutputChannelLogger.appendLine(
+      `Failed to execute command: '${command} ${args}'.\r\nCaught error: ${error}`,
+      LogVerbosity.Important
+    );
   }
 }
 

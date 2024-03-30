@@ -5,7 +5,6 @@ import {
   setMasterLock,
   isMasterLockEnabled,
 } from './lib/file-lock-manager';
-import path from 'path';
 import { TaskBarItemType as StatusBarItemType } from './lib/Enums';
 import {
   getConfig,
@@ -18,21 +17,20 @@ import {
   handlePOFileChange,
   handleCodeFileChange,
 } from './lib/fileHandling';
-import {
-  getPackageJsonAbsolutePath,
-  getLastThreeDirectories,
-} from './lib/fileManagement';
+import { getPackageJsonRelativePath } from './lib/fileManagement';
 import {
   notifyRequiredSettings,
   initializeStatusBarItems,
-  showRestartMessage,
 } from './lib/userInterface';
 import { StatusBarManager } from './lib/StatusBarManager';
+import { OutputChannelLogger } from './lib/OutputChannelLogger';
 
 let statusBarManager: StatusBarManager;
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log('Activated Translation File Watcher Extension');
+  OutputChannelLogger.appendLine(
+    'Activated Translation File Watcher Extension'
+  );
   const statusBarManager = StatusBarManager.getInstance();
 
   const myExtension = vscode.extensions.getExtension(
@@ -55,20 +53,8 @@ export async function activate(context: vscode.ExtensionContext) {
   initializeStatusBarItems();
   await initializeConfigurationWatcher(context);
 
-  vscode.window.showInformationMessage(
-    'Activated Translation File Watcher Extension.'
-  );
-
-  const packageJsonPath = await getPackageJsonAbsolutePath();
+  const packageJsonPath = await getPackageJsonRelativePath();
   if (packageJsonPath) {
-    vscode.window.setStatusBarMessage(
-      `TFW: ${getLastThreeDirectories(
-        path.dirname(packageJsonPath),
-        100
-      )} used as project directory.`,
-      7500
-    );
-
     statusBarManager.setStatusBarItemCommand(
       StatusBarItemType.PO,
       'extension.poFileWatcherStatusBarItemClicked'
@@ -82,12 +68,9 @@ export async function activate(context: vscode.ExtensionContext) {
       'extension.codeFileWatcherStatusBarItemClicked'
     );
   } else {
-    // vscode.window.showErrorMessage(
-    //   `The configured absolute json path could not be found. Please check your configuration.`
-    // );
     statusBarManager.setStatusBarItemText(
       StatusBarItemType.PO,
-      '$(eye-closed) JSON'
+      '$(eye-closed) PO'
     );
     statusBarManager.setStatusBarItemTooltip(
       StatusBarItemType.PO,
@@ -103,7 +86,7 @@ export async function activate(context: vscode.ExtensionContext) {
     );
     statusBarManager.setStatusBarItemText(
       StatusBarItemType.CODE,
-      '$(eye-closed) JSON'
+      '$(eye-closed) CODE'
     );
     statusBarManager.setStatusBarItemTooltip(
       StatusBarItemType.CODE,
@@ -159,11 +142,6 @@ export async function activate(context: vscode.ExtensionContext) {
       codeFileWatcherStatusBarItemClickedCommand
     );
   }
-  // else {
-  //   vscode.window.showErrorMessage(
-  //     'Please configure a locales path in the extension settings.'
-  //   );
-  // }
 
   const poFileWatcher = createFileWatcher(
     '**/locales/**/*.po',
@@ -209,8 +187,48 @@ export async function initializeConfigurationWatcher(
       await updateSynchronizedOptions(newValue);
     }
 
-    if (event.affectsConfiguration('translationFileWatcher')) {
-      showRestartMessage();
+    if (
+      event.affectsConfiguration(
+        'translationFileWatcher.logging.enableVerboseLogging'
+      )
+    ) {
+      const newValue = getConfig().get<boolean>(
+        'logging.enableVerboseLogging',
+        false
+      );
+      OutputChannelLogger.setVerboseLogging(newValue);
+    }
+
+    if (
+      event.affectsConfiguration(
+        'translationFileWatcher.fileGeneration.generatePo'
+      )
+    ) {
+      const newValue = getConfig().get<boolean>(
+        'fileGeneration.generatePo',
+        true
+      );
+      const statusBarManager = StatusBarManager.getInstance();
+
+      if (newValue) {
+        statusBarManager.setStatusBarItemText(
+          StatusBarItemType.PO,
+          '$(eye) PO'
+        );
+        statusBarManager.setStatusBarItemTooltip(
+          StatusBarItemType.PO,
+          'Watching PO files (click to generate PO files)'
+        );
+      } else {
+        statusBarManager.setStatusBarItemText(
+          StatusBarItemType.PO,
+          '$(eye-closed) PO'
+        );
+        statusBarManager.setStatusBarItemTooltip(
+          StatusBarItemType.PO,
+          'File watcher disabled because of settings.'
+        );
+      }
     }
   });
 }
@@ -220,5 +238,7 @@ export function deactivate() {
   statusBarManager.removeStatusBarItem(StatusBarItemType.JSON);
   statusBarManager.removeStatusBarItem(StatusBarItemType.CODE);
 
-  console.log('Deactivated Translation File Watcher Extension');
+  OutputChannelLogger.appendLine(
+    'Deactivated Translation File Watcher Extension'
+  );
 }
