@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/qvotaxon/translation-file-watcher"
   },
-  "version": "1.8.0",
+  "version": "1.8.1",
   "configurationVersion": "0.0.2",
   "engines": {
     "vscode": "^1.86.0"
