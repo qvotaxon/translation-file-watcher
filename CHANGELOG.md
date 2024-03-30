@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.8.0 (2024-03-30)
+
+
+### Features
+
+* implement task automatic task cancellation and debouncing ([#48](https://github.com/qvotaxon/translation-file-watcher/issues/48)) ([047515b](https://github.com/qvotaxon/translation-file-watcher/commit/047515bfe0586ea3fcb68d4ba03233c4f1ab5395))
+
 ### 1.7.4 (2024-03-26)
 
 
