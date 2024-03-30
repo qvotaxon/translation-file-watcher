@@ -47,7 +47,7 @@
           "translationFileWatcher.fileGeneration.generatePo": {
             "type": "boolean",
             "default": true,
-            "description": "Enable/disable generation of .po files from .json files. Useful for projects not requiring .po files."
+            "description": "Enable / disable generation of .po files from .json files. Useful for projects not requiring .po files."
           }
         }
       },
@@ -107,6 +107,17 @@
               "Automatic"
             ],
             "description": "Choose the mode for code files: automatic extraction of translation keys and updating of .json files using file watchers or manual extraction and update by clicking icons on the status bar."
+          }
+        }
+      },
+      {
+        "id": "logging",
+        "title": "Logging",
+        "properties": {
+          "translationFileWatcher.logging.enableVerboseLogging": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable / disable verbose logging to the Output Panel."
           }
         }
       }

@@ -1,23 +1,26 @@
 import { spawn } from 'child_process';
 import { CallbackOnMatch } from './Types';
-import { findPackageJson } from './fileManagement';
 import { window } from 'vscode';
 import path from 'path';
+import { getPackageJsonRelativePath } from './fileManagement';
+import { LogVerbosity } from './Enums';
+import { OutputChannelLogger } from './OutputChannelLogger';
 
 let projectRootPath: string | undefined = undefined;
 
+function getCommandMapKey(command: string, args: string[]) {
+  return `${command}${args.join('_').replace(new RegExp(' ', 'g'), '_')}`;
+}
+
 async function getProjectRootPath(): Promise<string> {
   if (!projectRootPath) {
-    const packageJsonPath = await getPackageJsonAbsolutePath();
+    const packageJsonPath = await getPackageJsonRelativePath();
 
     projectRootPath = path.dirname(packageJsonPath!);
   }
 
   return projectRootPath;
 }
-
-// Create a custom output channel for logging
-const outputChannel = window.createOutputChannel('Translation File Watcher');
 
 // Define a global variable to store active AbortControllers, debounce timers, process statuses, and verbosity
 const activeControllers: Map<
@@ -26,32 +29,6 @@ const activeControllers: Map<
 > = new Map();
 const debounceTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
 const processStatuses: Map<string, string> = new Map(); // Map to store process statuses: "running", "success", "error", "canceled"
-let verboseLogging = false; // Global verbosity flag, default to false
-
-// Enum for log types
-enum LogType {
-  Verbose,
-  Important, // Feel free to replace "Important" with a more suitable name
-}
-
-/**
- * @param {boolean} verbose Specifies whether to enable verbose logging
- */
-export function setVerboseLogging(verbose: boolean) {
-  verboseLogging = verbose;
-}
-
-/**
- * @param {string} message The message to log
- * @param {LogType} [logType=LogType.Verbose] Specifies the type of log message
- */
-function log(message: string, logType: LogType = LogType.Verbose) {
-  if (logType === LogType.Verbose && verboseLogging) {
-    outputChannel.appendLine(message);
-  } else if (logType === LogType.Important) {
-    outputChannel.appendLine(message);
-  }
-}
 
 /**
  * @param {string} command
@@ -76,8 +53,11 @@ export async function executeInBackground(
   let projectRoot = await getProjectRootPath();
 
   // Log the start of the execution
-  log(`Executing command: ${command} ${args.join(' ')}`, LogType.Important);
-  processStatuses.set(command, 'running');
+  OutputChannelLogger.appendLine(
+    `Executing command: ${command} ${args.join(' ')}`,
+    LogVerbosity.Important
+  );
+  processStatuses.set(getCommandMapKey(command, args), 'running');
 
   return new Promise((resolve, reject) => {
     // Create a new AbortController for this execution
@@ -87,19 +67,22 @@ export async function executeInBackground(
     // Function to cancel the execution
     const cancelExecution = () => {
       controller.abort();
-      clearTimeout(debounceTimers.get(command));
+      clearTimeout(debounceTimers.get(getCommandMapKey(command, args)));
     };
 
     // Check if there is an active controller for the same command
-    if (activeControllers.has(command)) {
+    if (activeControllers.has(getCommandMapKey(command, args))) {
       // If there is an active controller, cancel it
       const { controller: activeController, onCancel: activeOnCancel } =
-        activeControllers.get(command)!;
+        activeControllers.get(getCommandMapKey(command, args))!;
       activeController.abort();
       activeOnCancel();
-      clearTimeout(debounceTimers.get(command));
-      processStatuses.set(command, 'canceled');
-      log(`Execution of command ${command} canceled.`, LogType.Important);
+      clearTimeout(debounceTimers.get(getCommandMapKey(command, args)));
+      processStatuses.set(getCommandMapKey(command, args), 'canceled');
+      OutputChannelLogger.appendLine(
+        `Execution of command ${command} ${args.join(' ')} canceled.`,
+        LogVerbosity.Important
+      );
     }
 
     // Function to execute the command after debouncing
@@ -117,7 +100,7 @@ export async function executeInBackground(
         const output = data.toString();
         stdout += output;
 
-        log(output);
+        OutputChannelLogger.appendLine(output);
 
         if (
           successMatchSequence &&
@@ -132,56 +115,61 @@ export async function executeInBackground(
         const errorOutput = data.toString();
         stderr += errorOutput;
 
-        log(errorOutput);
+        OutputChannelLogger.appendLine(errorOutput);
       });
 
       childProcess.on('error', (error: any) => {
-        console.error('Failed to execute command:', error);
-        processStatuses.set(command, 'error');
-        log(`Failed to execute command: ${error}`, LogType.Important);
+        processStatuses.set(getCommandMapKey(command, args), 'error');
+        OutputChannelLogger.appendLine(
+          `Failed to execute command: ${command} ${args.join(
+            ' '
+          )}, got error: ${error}`,
+          LogVerbosity.Important
+        );
         reject(error);
       });
 
       childProcess.on('exit', (exitCode: null) => {
-        activeControllers.delete(command); // Remove the AbortController from the active controllers map
-        clearTimeout(debounceTimers.get(command));
+        activeControllers.delete(getCommandMapKey(command, args)); // Remove the AbortController from the active controllers map
+        clearTimeout(debounceTimers.get(getCommandMapKey(command, args)));
 
         if (exitCode !== null) {
-          log(
-            `Command ${command} exited with code: ${exitCode}`,
-            LogType.Important
+          OutputChannelLogger.appendLine(
+            `Command ${command} ${args.join(
+              ' '
+            )} exited with code: ${exitCode}`,
+            LogVerbosity.Important
           );
-          processStatuses.set(command, 'success');
+          processStatuses.set(getCommandMapKey(command, args), 'success');
           resolve({ stdout, stderr, exitCode, cancel: cancelExecution });
         } else {
-          const errorMessage = `Command ${command} exited with unknown code`;
-          console.error(errorMessage);
-          processStatuses.set(command, 'error');
-          log(errorMessage, LogType.Important);
+          const errorMessage = `Command ${command} ${args.join(
+            ' '
+          )} exited with unknown code`;
+          processStatuses.set(getCommandMapKey(command, args), 'error');
+          OutputChannelLogger.appendLine(errorMessage, LogVerbosity.Important);
           reject(new Error(errorMessage));
         }
       });
     };
 
     // Store the AbortController and onCancel callback for this command in the active controllers map
-    activeControllers.set(command, {
+    activeControllers.set(getCommandMapKey(command, args), {
       controller,
       onCancel: onCancel || (() => {}),
     });
 
     // Debounce the execution of the command
-    clearTimeout(debounceTimers.get(command));
+    clearTimeout(debounceTimers.get(getCommandMapKey(command, args)));
     debounceTimers.set(
-      command,
+      getCommandMapKey(command, args),
       setTimeout(() => {
         executeCommand();
-        log(`Debounced execution of command: ${command}`, LogType.Important);
+        OutputChannelLogger.appendLine(
+          `Debounced execution of command: ${command} ${args.join(' ')}`,
+          LogVerbosity.Important
+        );
       }, 500)
     ); // Adjust the debounce time as needed
   });
-}
-
-// Function to show the output channel
-export function showOutputChannel() {
-  outputChannel.show();
 }

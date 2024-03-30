@@ -2,19 +2,6 @@ import * as vscode from 'vscode';
 import { StatusBarManager } from './StatusBarManager';
 import { TaskBarItemType } from './Enums';
 
-export function showRestartMessage() {
-  vscode.window
-    .showInformationMessage(
-      'Settings have been updated. Please restart the extension for the changes to take effect.',
-      'Restart'
-    )
-    .then((action) => {
-      if (action === 'Restart') {
-        vscode.commands.executeCommand('workbench.action.reloadWindow');
-      }
-    });
-}
-
 export function notifyRequiredSettings() {
   vscode.window
     .showInformationMessage(
