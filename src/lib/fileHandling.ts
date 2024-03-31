@@ -29,20 +29,13 @@ export function checkMergeStatus(): boolean {
 }
 
 export function sortJsonFile(filePath: string): void {
-  // Read the JSON data from the file
   const jsonData = fs.readFileSync(filePath, 'utf-8');
   const jsonObject: JsonObject = JSON.parse(jsonData);
-
-  // Sort the JSON object
   const sortedObject = sortJson(jsonObject);
-
-  // Convert the sorted JSON object to a string with indentation of 4 spaces and desired line endings
   let jsonString = JSON.stringify(sortedObject, null, 4);
 
-  // Add a trailing newline
   jsonString += '\n';
 
-  // Write the modified JSON string back to the file
   fs.writeFileSync(filePath, jsonString, 'utf-8');
 }
 
@@ -229,56 +222,25 @@ export async function handleJsonFileChange(
   }
 }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
 let previousFileContents: string[] = [];
 let currentFileContents: string[] = [];
 
-// Function to handle file changes
 function updateCurrentFileContents(fsPath: string) {
-  // Read the current content of the file
   const fileContent = fs.readFileSync(fsPath, { encoding: 'utf8' });
-  // fs.readFile(fsPath, 'utf8', (err, fileContent) => {
-  //   if (err) {
-  //     console.error(err);
-  //     return;
-  //   }
-
   currentFileContents[fsPath as keyof object] = fileContent;
-
-  // });
 }
 
 function storeFileState(fsPath: string) {
-  // Get the previous content of the file
   const previousData = previousFileContents[fsPath as keyof object] || '';
 
-  // Compare the current content with the previous content
   if (currentFileContents[fsPath as keyof object] !== previousData) {
-    // Content has changed
     OutputChannelLogger.appendLine(`File contents of ${fsPath} changed.`);
 
-    // Update the previous content with the current content
     previousFileContents[fsPath as keyof object] =
       currentFileContents[fsPath as keyof object];
   }
 }
 
-// Function to extract translation keys from the changed lines
 function extractTranslationKeys(lines: string[]) {
   const translationKeys: string[] = [];
   const keyRegex = /(?:I18nKey|t)\(\s*['"`](.*?)['"`]\s*\)/g;
@@ -294,13 +256,11 @@ function extractTranslationKeys(lines: string[]) {
 }
 
 function getChangedLines(currentData: string, previousData: string): string[] {
-  // Split the content into lines
   const currentLines = currentData.split('\n');
   const previousLines = previousData?.split('\n') ?? [];
 
   const changedLines = [];
 
-  // Create maps of trimmed lines for efficient lookup
   const currentLineSet = new Set(currentLines.map((line) => line.trim()));
   const previousLineSet = new Set(previousLines.map((line) => line.trim()));
 
@@ -308,7 +268,6 @@ function getChangedLines(currentData: string, previousData: string): string[] {
   for (let i = 0; i < currentLines.length; i++) {
     const currentLine = currentLines[i].trim();
 
-    // If the line is not in the previous version, it's an added line
     if (!previousLineSet.has(currentLine)) {
       changedLines.push(currentLines[i]);
     }
@@ -318,7 +277,6 @@ function getChangedLines(currentData: string, previousData: string): string[] {
   for (let i = 0; i < previousLines.length; i++) {
     const previousLine = previousLines[i].trim();
 
-    // If the line is not in the current version, it's a removed line
     if (!currentLineSet.has(previousLine)) {
       changedLines.push(previousLines[i]);
     }
@@ -328,14 +286,12 @@ function getChangedLines(currentData: string, previousData: string): string[] {
 }
 
 function fileChangeContainsTranslationKeys(fsPath: string): boolean {
-  // Extract translation keys from the changed lines
   const changedLines = getChangedLines(
     currentFileContents[fsPath as keyof object],
     previousFileContents[fsPath as keyof object]
   );
   const translationKeys = extractTranslationKeys(changedLines);
 
-  // Output the found translation keys
   console.log('Changed lines:');
   console.log(changedLines);
   console.log('Translation keys:');
@@ -374,7 +330,6 @@ export async function handleCodeFileChange(
 
   updateCurrentFileContents(fsPath!);
 
-  // Compare the current content with the previous content
   const fileChangeOccurred =
     currentFileContents[fsPath as keyof object] !==
       previousFileContents[fsPath as keyof object] || '';
@@ -434,10 +389,8 @@ export function processPOFiles(
     const filePath = path.join(directory, file);
     const stat = fs.statSync(filePath);
     if (stat.isDirectory()) {
-      // Recursively search subdirectories
       processPOFiles(filePath, triggeredByFileWatcher, callback);
     } else if (file.endsWith('.po')) {
-      // Call the callback function for *.po files
       callback(filePath, triggeredByFileWatcher);
     }
   });
@@ -452,10 +405,8 @@ export function processJSONFiles(
     const filePath = path.join(directory, file);
     const stat = fs.statSync(filePath);
     if (stat.isDirectory()) {
-      // Recursively search subdirectories
       processJSONFiles(filePath, triggeredByFileWatcher, callback);
     } else if (file.endsWith('.json')) {
-      // Call the callback function for *.json files
       callback(filePath, triggeredByFileWatcher);
     }
   });
