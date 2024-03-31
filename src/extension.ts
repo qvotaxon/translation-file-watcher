@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
-import { createFileWatcher } from './lib/file-watcher';
+import {
+  createSingleFileWatcherForGlob,
+  createFileWatcherForEachFileInGlob,
+} from './lib/file-watcher';
 import {
   arePoFilesLocked,
   setMasterLock,
@@ -142,26 +145,30 @@ export async function activate(context: vscode.ExtensionContext) {
       codeFileWatcherStatusBarItemClickedCommand
     );
   }
+  //TODO: use relativeLocalesPath to read po files from. Same for tsx ts files.
 
-  const poFileWatcher = createFileWatcher(
+  const poFileWatchers = createFileWatcherForEachFileInGlob(
     '**/locales/**/*.po',
     handlePOFileChange,
     isMasterLockEnabled,
     arePoFilesLocked
   );
-
-  const codeFileWatcher = createFileWatcher(
-    '**/{apps,libs}/**/*.{tsx,ts}',
-    handleCodeFileChange,
-    isMasterLockEnabled
-  );
-  const jsonFileWatcher = createFileWatcher(
+  const jsonFileWatchers = createFileWatcherForEachFileInGlob(
     '**/locales/**/*.json',
     handleJsonFileChange,
     isMasterLockEnabled
   );
+  const codeFileWatcher = createSingleFileWatcherForGlob(
+    '**/{apps,libs}/**/*.{tsx,ts}',
+    handleCodeFileChange,
+    isMasterLockEnabled
+  );
 
-  context.subscriptions.push(poFileWatcher, codeFileWatcher, jsonFileWatcher);
+  context.subscriptions.push(
+    ...poFileWatchers,
+    ...jsonFileWatchers,
+    codeFileWatcher
+  );
 }
 
 vscode.commands.registerCommand(
