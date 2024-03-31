@@ -229,6 +229,184 @@ export async function handleJsonFileChange(
   }
 }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+let previousFileContents: string[] = [];
+let currentFileContents: string[] = [];
+
+// Function to handle file changes
+function updateCurrentFileContents(fsPath: string) {
+  // Read the current content of the file
+  const fileContent = fs.readFileSync(fsPath, { encoding: 'utf8' });
+  // fs.readFile(fsPath, 'utf8', (err, fileContent) => {
+  //   if (err) {
+  //     console.error(err);
+  //     return;
+  //   }
+
+  currentFileContents[fsPath as keyof object] = fileContent;
+
+  // });
+}
+
+function storeFileState(fsPath: string) {
+  // Get the previous content of the file
+  const previousData = previousFileContents[fsPath as keyof object] || '';
+
+  // Compare the current content with the previous content
+  if (currentFileContents[fsPath as keyof object] !== previousData) {
+    // Content has changed
+    OutputChannelLogger.appendLine(`File contents of ${fsPath} changed.`);
+
+    // Update the previous content with the current content
+    previousFileContents[fsPath as keyof object] =
+      currentFileContents[fsPath as keyof object];
+  }
+}
+
+// Function to extract translation keys from the changed lines
+function extractTranslationKeys(lines: string[]) {
+  const translationKeys: string[] = [];
+  const keyRegex = /(?:I18nKey|t)\(\s*['"`](.*?)['"`]\s*\)/g;
+
+  lines.forEach((line: string) => {
+    let match;
+    while ((match = keyRegex.exec(line)) !== null) {
+      translationKeys.push(match[1]);
+    }
+  });
+
+  return translationKeys;
+}
+
+// Function to extract changed lines from the file
+// function getChangedLines(currentData: string, previousData: string): string[] {
+//   // Split the content into lines
+//   const currentLines = currentData.split('\n');
+//   const previousLines = previousData?.split('\n') ?? [];
+
+//   // Find the changed lines
+//   const changedLines = [];
+//   for (let i = 0; i < currentLines.length; i++) {
+//     if (currentLines[i] !== previousLines[i]) {
+//       changedLines.push(currentLines[i]);
+//     }
+//   }
+
+//   return changedLines;
+// }
+
+function getChangedLines(currentData: string, previousData: string): string[] {
+  // Split the content into lines
+  const currentLines = currentData.split('\n');
+  const previousLines = previousData?.split('\n') ?? [];
+
+  const changedLines = [];
+
+  // Create maps of trimmed lines for efficient lookup
+  const currentLineSet = new Set(currentLines.map((line) => line.trim()));
+  const previousLineSet = new Set(previousLines.map((line) => line.trim()));
+
+  // Find the changed lines
+  for (let i = 0; i < currentLines.length; i++) {
+    const currentLine = currentLines[i].trim();
+
+    // If the line is not in the previous version, it's an added line
+    if (!previousLineSet.has(currentLine)) {
+      changedLines.push(currentLines[i]);
+    }
+  }
+
+  // Find the removed lines
+  for (let i = 0; i < previousLines.length; i++) {
+    const previousLine = previousLines[i].trim();
+
+    // If the line is not in the current version, it's a removed line
+    if (!currentLineSet.has(previousLine)) {
+      changedLines.push(previousLines[i]);
+    }
+  }
+
+  return changedLines;
+}
+
+// Function to extract changed lines from the file
+// function getChangedLines(currentData: string, previousData: string): string[] {
+//   // Split the content into lines
+//   const currentLines = currentData.split('\n');
+//   const previousLines = previousData?.split('\n') ?? [];
+
+//   // Compare line counts
+//   if (currentLines.length !== previousLines.length) {
+//     // Line counts are different, but text content might be the same
+//     const minLength = Math.min(currentLines.length, previousLines.length);
+//     let commonLines = 0;
+
+//     // Find the number of common lines at the beginning
+//     for (let i = 0; i < minLength; i++) {
+//       if (currentLines[i] === previousLines[i]) {
+//         commonLines++;
+//       } else {
+//         break;
+//       }
+//     }
+
+//     // Calculate the number of lines added or removed
+//     const linesAdded = currentLines.length - commonLines;
+//     const linesRemoved = previousLines.length - commonLines;
+
+//     // If lines are added at the top
+//     if (linesAdded > linesRemoved) {
+//       return currentLines.slice(0, linesAdded);
+//     }
+//     // If lines are removed from the top
+//     else if (linesRemoved > linesAdded) {
+//       return previousLines.slice(0, linesRemoved);
+//     }
+//   }
+
+//   // Find the changed lines
+//   const changedLines = [];
+//   for (let i = 0; i < currentLines.length; i++) {
+//     if (currentLines[i] !== previousLines[i]) {
+//       changedLines.push(currentLines[i]);
+//     }
+//   }
+
+//   return changedLines;
+// }
+
+function fileChangeContainsTranslationKeys(fsPath: string): boolean {
+  // Extract translation keys from the changed lines
+  const changedLines = getChangedLines(
+    currentFileContents[fsPath as keyof object],
+    previousFileContents[fsPath as keyof object]
+  );
+  const translationKeys = extractTranslationKeys(changedLines);
+
+  // Output the found translation keys
+  console.log('Changed lines:');
+  console.log(changedLines);
+  console.log('Translation keys:');
+  console.log(translationKeys);
+
+  return translationKeys.length > 0;
+}
+
 export async function handleCodeFileChange(
   fsPath: string | undefined = undefined,
   triggeredByFileWatcher: boolean = true
@@ -257,37 +435,57 @@ export async function handleCodeFileChange(
     OutputChannelLogger.appendLine(`Manual code change trigger received.`);
   }
 
-  statusBarManager.setStatusBarItemText(
-    TaskBarItemType.JSON,
-    '$(sync~spin) JSON'
-  );
-  statusBarManager.setStatusBarItemText(TaskBarItemType.CODE, '$(search) CODE');
+  updateCurrentFileContents(fsPath!);
 
-  const i18nScannerConfigRelativePath = getConfig().get<string>(
-    'i18nScannerConfigRelativePath',
-    'i18next-scanner.config.js'
-  );
-  const command = 'npx';
-  const args = [
-    'i18next-scanner',
-    // `"${uri.fsPath}"`, //TODO: nogmaals kijken of per file idd net zo snel is als hele project. Wel eerst removeUnusedKeys uitzetten.
-    `--config ${i18nScannerConfigRelativePath}`,
-  ];
-  try {
-    const exitCode = await executeInBackground(command, args);
+  // Compare the current content with the previous content
+  const fileChangeOccurred =
+    currentFileContents[fsPath as keyof object] !==
+      previousFileContents[fsPath as keyof object] || '';
 
-    statusBarManager.setStatusBarItemText(TaskBarItemType.JSON, '$(eye) JSON');
-    statusBarManager.setStatusBarItemText(TaskBarItemType.CODE, '$(eye) CODE');
-
-    OutputChannelLogger.appendLine(
-      `Command executed with exit code: ${exitCode}`
+  if (fileChangeOccurred && fileChangeContainsTranslationKeys(fsPath!)) {
+    statusBarManager.setStatusBarItemText(
+      TaskBarItemType.JSON,
+      '$(sync~spin) JSON'
     );
-  } catch (error) {
-    OutputChannelLogger.appendLine(
-      `Failed to execute command: '${command} ${args}'.\r\nCaught error: ${error}`,
-      LogVerbosity.Important
+    statusBarManager.setStatusBarItemText(
+      TaskBarItemType.CODE,
+      '$(search) CODE'
     );
+
+    const i18nScannerConfigRelativePath = getConfig().get<string>(
+      'i18nScannerConfigRelativePath',
+      'i18next-scanner.config.js'
+    );
+    const command = 'npx';
+    const args = [
+      'i18next-scanner',
+      // `"${uri.fsPath}"`, //TODO: nogmaals kijken of per file idd net zo snel is als hele project. Wel eerst removeUnusedKeys uitzetten.
+      `--config ${i18nScannerConfigRelativePath}`,
+    ];
+    try {
+      const exitCode = await executeInBackground(command, args);
+
+      statusBarManager.setStatusBarItemText(
+        TaskBarItemType.JSON,
+        '$(eye) JSON'
+      );
+      statusBarManager.setStatusBarItemText(
+        TaskBarItemType.CODE,
+        '$(eye) CODE'
+      );
+
+      OutputChannelLogger.appendLine(
+        `Command executed with exit code: ${exitCode}`
+      );
+    } catch (error) {
+      OutputChannelLogger.appendLine(
+        `Failed to execute command: '${command} ${args}'.\r\nCaught error: ${error}`,
+        LogVerbosity.Important
+      );
+    }
   }
+
+  storeFileState(fsPath!);
 }
 
 export function processPOFiles(
