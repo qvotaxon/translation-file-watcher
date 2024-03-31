@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.8.1 (2024-03-30)
+
+
+### Bug Fixes
+
+* make po file locks locale specific ([#49](https://github.com/qvotaxon/translation-file-watcher/issues/49)) ([90ddfe5](https://github.com/qvotaxon/translation-file-watcher/commit/90ddfe5ed3b6d78030a10bd2d2198d2dcd1331d7))
+
 ## 1.8.0 (2024-03-30)
 
 
