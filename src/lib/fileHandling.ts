@@ -293,23 +293,6 @@ function extractTranslationKeys(lines: string[]) {
   return translationKeys;
 }
 
-// Function to extract changed lines from the file
-// function getChangedLines(currentData: string, previousData: string): string[] {
-//   // Split the content into lines
-//   const currentLines = currentData.split('\n');
-//   const previousLines = previousData?.split('\n') ?? [];
-
-//   // Find the changed lines
-//   const changedLines = [];
-//   for (let i = 0; i < currentLines.length; i++) {
-//     if (currentLines[i] !== previousLines[i]) {
-//       changedLines.push(currentLines[i]);
-//     }
-//   }
-
-//   return changedLines;
-// }
-
 function getChangedLines(currentData: string, previousData: string): string[] {
   // Split the content into lines
   const currentLines = currentData.split('\n');
@@ -343,52 +326,6 @@ function getChangedLines(currentData: string, previousData: string): string[] {
 
   return changedLines;
 }
-
-// Function to extract changed lines from the file
-// function getChangedLines(currentData: string, previousData: string): string[] {
-//   // Split the content into lines
-//   const currentLines = currentData.split('\n');
-//   const previousLines = previousData?.split('\n') ?? [];
-
-//   // Compare line counts
-//   if (currentLines.length !== previousLines.length) {
-//     // Line counts are different, but text content might be the same
-//     const minLength = Math.min(currentLines.length, previousLines.length);
-//     let commonLines = 0;
-
-//     // Find the number of common lines at the beginning
-//     for (let i = 0; i < minLength; i++) {
-//       if (currentLines[i] === previousLines[i]) {
-//         commonLines++;
-//       } else {
-//         break;
-//       }
-//     }
-
-//     // Calculate the number of lines added or removed
-//     const linesAdded = currentLines.length - commonLines;
-//     const linesRemoved = previousLines.length - commonLines;
-
-//     // If lines are added at the top
-//     if (linesAdded > linesRemoved) {
-//       return currentLines.slice(0, linesAdded);
-//     }
-//     // If lines are removed from the top
-//     else if (linesRemoved > linesAdded) {
-//       return previousLines.slice(0, linesRemoved);
-//     }
-//   }
-
-//   // Find the changed lines
-//   const changedLines = [];
-//   for (let i = 0; i < currentLines.length; i++) {
-//     if (currentLines[i] !== previousLines[i]) {
-//       changedLines.push(currentLines[i]);
-//     }
-//   }
-
-//   return changedLines;
-// }
 
 function fileChangeContainsTranslationKeys(fsPath: string): boolean {
   // Extract translation keys from the changed lines
