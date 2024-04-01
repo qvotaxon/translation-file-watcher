@@ -5,6 +5,7 @@
 ![License](https://img.shields.io/badge/License-MIT-blue.png)
 ![Downloads](https://img.shields.io/visual-studio-marketplace/d/qvotaxon.translation-file-watcher.png)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/qvotaxon/translation-file-watcher/release.yml?branch=main)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_shield)
 ![Open Issues](https://img.shields.io/github/issues/qvotaxon/translation-file-watcher)
 ![Closed Issues](https://img.shields.io/github/issues-closed/qvotaxon/translation-file-watcher)
 ![Contributors](https://img.shields.io/github/contributors/qvotaxon/translation-file-watcher)
@@ -85,3 +86,7 @@ This extension leans heaviliy on the following two libraries.
 TODO
 
 - Tell a bit more About Me...
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_large)
