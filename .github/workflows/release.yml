@@ -124,9 +124,7 @@ jobs:
         # if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run:
-          gh release upload ${{ steps.release.outputs.tag_name }} vscode-translation-file-watcher-${{
-          steps.release.outputs.tag_name }}.vsix
+        run: gh release upload 1.8.2 vscode-translation-file-watcher-1.8.2.vsix
       # - name: vsce publish
       #   if: ${{ steps.release.outputs.release_created }}
       #   env:
