@@ -89,6 +89,6 @@ TODO
 
 - Tell a bit more About Me...
 
-## License
+<!-- ## License
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_large) -->
