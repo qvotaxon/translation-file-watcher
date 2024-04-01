@@ -69,14 +69,14 @@ jobs:
         run: npm ci --silent
 
       - name: Create extension
-        run: npx vsce package -o vscode-translation-file-watcher-${{github.sha}}.vsix
+        run: npx vsce package -o translation-file-watcher-${{github.sha}}.vsix
 
       - name: Upload extension
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: vscode-translation-file-watcher-
-          path: vscode-translation-file-watcher-${{github.sha}}.vsix
+          name: translation-file-watcher-
+          path: translation-file-watcher-${{github.sha}}.vsix
 
   release-please:
     name: release-please
@@ -119,12 +119,12 @@ jobs:
         run: npm ci --silent
       - name: vsce package
         # if: ${{ steps.release.outputs.release_created }}
-        run: npx vsce package -o vscode-translation-file-watcher-${{steps.release.outputs.tag_name}}.vsix
+        run: npx vsce package -o translation-file-watcher-${{steps.release.outputs.tag_name}}.vsix
       - name: Upload Release Artifact
         # if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload 1.8.2 vscode-translation-file-watcher-1.8.2.vsix
+        run: gh release upload 1.8.2 translation-file-watcher-1.8.2.vsix
       # - name: vsce publish
       #   if: ${{ steps.release.outputs.release_created }}
       #   env:
