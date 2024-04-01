@@ -1,5 +1,5 @@
-![Logo](./logo.jpg)
-<small>Generated using CoPilot</small>
+<!-- ![Logo](./logo.jpg)
+<small>Generated using CoPilot</small> -->
 
 ![Visual Studio Code](https://img.shields.io/badge/VS%20Code-^1.61.0-blue.png)
 ![License](https://img.shields.io/badge/License-MIT-blue.png)
