@@ -1,9 +1,9 @@
 ![Logo](./logo.jpg)
 <small>Generated using CoPilot</small>
 
-![Visual Studio Code](https://img.shields.io/badge/VS%20Code-^1.61.0-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![Downloads](https://img.shields.io/visual-studio-marketplace/d/qvotaxon.translation-file-watcher.svg)
+![Visual Studio Code](https://img.shields.io/badge/VS%20Code-^1.61.0-blue.png)
+![License](https://img.shields.io/badge/License-MIT-blue.png)
+![Downloads](https://img.shields.io/visual-studio-marketplace/d/qvotaxon.translation-file-watcher.png)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/qvotaxon/translation-file-watcher/release.yml?branch=main)
 ![Open Issues](https://img.shields.io/github/issues/qvotaxon/translation-file-watcher)
 ![Closed Issues](https://img.shields.io/github/issues-closed/qvotaxon/translation-file-watcher)
@@ -23,7 +23,7 @@ TODO:
 
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+<!-- ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here) -->
 
 ## Features
 
