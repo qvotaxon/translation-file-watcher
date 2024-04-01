@@ -120,15 +120,15 @@ jobs:
       - name: vsce package
         # if: ${{ steps.release.outputs.release_created }}
 
-        #TODO: Change version below ${{ steps.release.outputs.tag_name }}
-        run: npx vsce package -o translation-file-watcher-1.8.2.vsix
+        #TODO: Change version below
+        run: npx vsce package -o translation-file-watcher-${{steps.release.outputs.tag_name}}.vsix
       - name: Upload Release Artifact
         # if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          #TODO: Change version below ${{ steps.release.outputs.tag_name }}
-        run: gh release upload 1.8.2 translation-file-watcher-1.8.2.vsix
+          #TODO: Change version below
+        run: gh release upload ${{ steps.release.outputs.tag_name }} translation-file-watcher-${{ steps.release.outputs.tag_name }}.vsix
       # - name: vsce publish
       #   if: ${{ steps.release.outputs.release_created }}
       #   env:
