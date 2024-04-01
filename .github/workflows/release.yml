@@ -80,16 +80,16 @@ jobs:
 
   release-please:
     name: release-please
-    if: ${{ github.ref == 'refs/heads/main' }}
+    # if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v4
+      - uses: google-github-actions/release-please-action@v4.1.0
         id: release
         with:
           # this assumes that you have created a personal access token
           # (PAT) and configured it as a GitHub action secret named
           # `MY_RELEASE_PLEASE_TOKEN` (this secret name is not important).
-          token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
+          token: ${{ secrets.RELEASE_PLEASE_KEY }}
           # this is a built-in strategy in release-please, see "Action Inputs"
           # for more options
           release-type: node
