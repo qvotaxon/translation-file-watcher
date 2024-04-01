@@ -1,16 +1,18 @@
-name: Release
+name: Code Check & Test
+
+on: [pull_request, push]
+
 permissions:
   contents: write
-
-on:
-  push:
-    branches:
-      - main
-
+  pull-requests: write
 jobs:
-  update_release:
-    runs-on: ubuntu-latest
-
+  build:
+    name: Build & Test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,87 +34,101 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install
+      - name: npm install
+        run: npm ci --silent
 
-      - name: Build and Package Extension
-        run: |
-          # Build and package your extension into a VSIX file
-          npm run package
+      - name: Build
+        run: npm run test-compile
 
-      - name: Upload Changelog
+      - name: Lint
+        run: npm run lint
+
+      #Disabled for now because it will fail on ubuntu.
+      #- name: Test
+      #  run: npm run test
+
+  create:
+    name: Create extension
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache npm packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: npm install
+        run: npm ci --silent
+
+      - name: Create extension
+        run: npx vsce package -o vscode-translation-file-watcher-${{github.sha}}.vsix
+
+      - name: Upload extension
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: changelog
-          path: CHANGELOG.md
+          name: vscode-translation-file-watcher-
+          path: vscode-translation-file-watcher-${{github.sha}}.vsix
 
-      - name: Upload License
-        uses: actions/upload-artifact@v4
+  release-please:
+    name: release-please
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v4.1.0
+        id: release
         with:
-          name: license
-          path: LICENSE
+          # this assumes that you have created a personal access token
+          # (PAT) and configured it as a GitHub action secret named
+          # `MY_RELEASE_PLEASE_TOKEN` (this secret name is not important).
+          token: ${{ secrets.RELEASE_PLEASE_KEY }}
+          # this is a built-in strategy in release-please, see "Action Inputs"
+          # for more options
+          release-type: node
 
-      - name: Move to Release Branch
-        run: |
-          # Move to the release branch
-          # git fetch origin release main
-          git fetch origin release main
-          git checkout release --force
+          # release-type: node
 
-      - name: Download Changelog
-        uses: actions/download-artifact@v4
+          # package-name: translation-file-watcher
+          # command: github-release
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
+
+      - name: Cache npm packages
+        uses: actions/cache@v4
         with:
-          name: changelog
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
 
-      - name: Download License
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        if: ${{ steps.release.outputs.release_created }}
         with:
-          name: license
-
-      - name: List and Sort .vsix files
-        run: |
-          ls -1 translation-file-watcher-*.vsix | sort -V > sorted_vsix_files.txt
-          echo "Sorted .vsix files:"
-          cat sorted_vsix_files.txt
-
-      - name: Determine versions to keep
-        run: |
-          tail -n 3 sorted_vsix_files.txt > vsix_files_to_keep.txt
-          echo "Files to keep:"
-          cat vsix_files_to_keep.txt
-
-      - name: Remove old .vsix files
-        run: |
-          file_count=$(wc -l < sorted_vsix_files.txt)
-          if [ "$file_count" -gt 3 ]; then
-            cat sorted_vsix_files.txt | while read line; do
-              if ! grep -Fxq "$line" vsix_files_to_keep.txt; then
-                rm "$line"
-                git add "$line"
-                echo "Removing $line"
-              fi
-            done
-          else
-            echo "There are 3 or fewer .vsix files. No files will be removed."
-          fi
-
-      - name: Get latest version
-        id: version
-        run: |
-          latest_version=$(tail -n 1 sorted_vsix_files.txt | sed 's/.*-\([0-9]\+\.[0-9]\+\.[0-9]\+\)\.vsix/\1/')
-          echo "version=$latest_version" >> $GITHUB_OUTPUT
-          echo "Latest version: $latest_version"
-
-      - name: Commit and Push Changes
-        run: |
-          version=$(echo "${{ steps.version.outputs.version }}")
-          if [ -n "$(git diff --exit-code)" ]; then
-            git add '*.vsix' 'LICENSE' 'CHANGELOG.md'
-            git commit -m "chore(release): release version $version"
-            git push origin release
-          else
-            echo "No changes to commit."
-          fi
-
-          # Switch back to the main branch
-          git checkout main
+          node-version: '20'
+          cache: 'npm'
+      - name: npm install
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm ci --silent
+      - name: vsce package
+        if: ${{ steps.release.outputs.release_created }}
+        run: npx vsce package -o vscode-translation-file-watcher-${{steps.release.outputs.tag_name}}.vsix
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run:
+          gh release upload ${{ steps.release.outputs.tag_name }} vscode-translation-file-watcher-${{
+          steps.release.outputs.tag_name }}.vsix
+      # - name: vsce publish
+      #   if: ${{ steps.release.outputs.release_created }}
+      #   env:
+      #     VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
+      #   run: npx vsce publish
