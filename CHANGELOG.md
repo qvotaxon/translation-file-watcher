@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.8.2...v1.9.0) (2024-04-01)
+
+
+### Features
+
+* trying to release ([#54](https://github.com/qvotaxon/translation-file-watcher/issues/54)) ([d340829](https://github.com/qvotaxon/translation-file-watcher/commit/d3408294d3a528f7fd01d4e160b45b535e442f28))
+
 ### 1.8.2 (2024-03-31)
 
 ### 1.8.1 (2024-03-30)
