@@ -80,7 +80,7 @@ jobs:
 
   release-please:
     name: release-please
-    # if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v4.1.0
@@ -100,7 +100,7 @@ jobs:
           # command: github-release
 
       - uses: actions/checkout@v4
-        # if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }}
 
       - name: Cache npm packages
         uses: actions/cache@v4
@@ -110,25 +110,25 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        # if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }}
         with:
           node-version: '20'
           cache: 'npm'
       - name: npm install
-        # if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }}
         run: npm ci --silent
       - name: vsce package
-        # if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }}
 
-        #TODO: Change version below ${{ steps.release.outputs.tag_name }}
-        run: npx vsce package -o translation-file-watcher-1.8.2.vsix
+        #TODO: Change version below
+        run: npx vsce package -o translation-file-watcher-${{steps.release.outputs.tag_name}}.vsix
       - name: Upload Release Artifact
-        # if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          #TODO: Change version below ${{ steps.release.outputs.tag_name }}
-        run: gh release upload 1.8.2 translation-file-watcher-1.8.2.vsix
+          #TODO: Change version below
+        run: gh release upload ${{ steps.release.outputs.tag_name }} translation-file-watcher-${{ steps.release.outputs.tag_name }}.vsix
       # - name: vsce publish
       #   if: ${{ steps.release.outputs.release_created }}
       #   env:
