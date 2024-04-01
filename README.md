@@ -24,6 +24,7 @@ TODO:
 ## Screenshots
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_shield)
 
 ## Features
 
@@ -85,3 +86,7 @@ This extension leans heaviliy on the following two libraries.
 TODO
 
 - Tell a bit more About Me...
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_large)
