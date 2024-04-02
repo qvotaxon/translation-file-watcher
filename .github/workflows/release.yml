@@ -57,7 +57,12 @@ jobs:
         uses: actions/cache@v4
         with:
           # todo: check for os: ~/ is not valid for windows
-          path: ~/.npm
+          path: |
+            if [ "${{ runner.os }}" = "Windows" ]; then
+              'C:/npm'
+            else
+              '~/.npm'
+            fi
           key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
 
       - name: Setup Node.js
