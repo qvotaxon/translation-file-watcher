@@ -23,6 +23,7 @@ jobs:
           git config --global user.name "Translation File Watcher"
 
       - name: Determine npm package cache path for os
+        id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             npm_cache_path="C:/npm"
@@ -30,7 +31,7 @@ jobs:
             npm_cache_path="$HOME/.npm"
           fi
           echo "::set-output name=npm_cache_path::$npm_cache_path"
-        id: npm-cache-path
+        shell: bash
 
       - name: Cache npm packages
         uses: actions/cache@v4
@@ -76,6 +77,7 @@ jobs:
       #     key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
 
       - name: Determine npm package cache path for os
+        id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             npm_cache_path="C:/npm"
@@ -83,7 +85,7 @@ jobs:
             npm_cache_path="$HOME/.npm"
           fi
           echo "::set-output name=npm_cache_path::$npm_cache_path"
-        id: npm-cache-path
+        shell: bash
 
       - name: Cache npm packages
         uses: actions/cache@v4
@@ -135,6 +137,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
 
       - name: Determine npm package cache path for os
+        id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             npm_cache_path="C:/npm"
@@ -142,7 +145,7 @@ jobs:
             npm_cache_path="$HOME/.npm"
           fi
           echo "::set-output name=npm_cache_path::$npm_cache_path"
-        id: npm-cache-path
+        shell: bash
 
       - name: Cache npm packages
         uses: actions/cache@v4
