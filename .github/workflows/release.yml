@@ -26,7 +26,7 @@ jobs:
         id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
-            npm_cache_path="${HOME}/AppData/Roaming/npm-cache"
+            npm_cache_path="C:/npm/cache"
           else
             npm_cache_path="$HOME/.npm"
           fi
@@ -80,7 +80,7 @@ jobs:
         id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
-            npm_cache_path="${HOME}/AppData/Roaming/npm-cache"
+            npm_cache_path="C:/npm/cache"
           else
             npm_cache_path="$HOME/.npm"
           fi
@@ -137,15 +137,14 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
 
       - name: Determine npm package cache path for os
-        id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
-            npm_cache_path="${HOME}/AppData/Roaming/npm-cache"
+            npm_cache_path="C:/npm/cache"
           else
             npm_cache_path="$HOME/.npm"
           fi
           echo "::set-output name=npm_cache_path::$npm_cache_path"
-        shell: bash
+        id: npm-cache-path
 
       - name: Cache npm packages
         uses: actions/cache@v4
