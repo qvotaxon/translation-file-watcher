@@ -56,6 +56,7 @@ jobs:
       - name: Cache npm packages
         uses: actions/cache@v4
         with:
+          # todo: check for os: ~/ is not valid for windows
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
 
