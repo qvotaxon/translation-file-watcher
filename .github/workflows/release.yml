@@ -26,7 +26,7 @@ jobs:
         id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
-            npm_cache_path="C:/npm"
+            npm_cache_path="${HOME}/AppData/Roaming/npm-cache"
           else
             npm_cache_path="$HOME/.npm"
           fi
@@ -80,7 +80,7 @@ jobs:
         id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
-            npm_cache_path="C:/npm"
+            npm_cache_path="${HOME}/AppData/Roaming/npm-cache"
           else
             npm_cache_path="$HOME/.npm"
           fi
@@ -140,7 +140,7 @@ jobs:
         id: npm-cache-path
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
-            npm_cache_path="C:/npm"
+            npm_cache_path="${HOME}/AppData/Roaming/npm-cache"
           else
             npm_cache_path="$HOME/.npm"
           fi
