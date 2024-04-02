@@ -30,7 +30,7 @@ jobs:
           else
             npm_cache_path="$HOME/.npm"
           fi
-          echo "::set-output name=npm_cache_path::$npm_cache_path"
+          echo "npm_cache_path=$npm_cache_path" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Cache npm packages
@@ -84,7 +84,7 @@ jobs:
           else
             npm_cache_path="$HOME/.npm"
           fi
-          echo "::set-output name=npm_cache_path::$npm_cache_path"
+          echo "npm_cache_path=$npm_cache_path" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Cache npm packages
@@ -143,7 +143,7 @@ jobs:
           else
             npm_cache_path="$HOME/.npm"
           fi
-          echo "::set-output name=npm_cache_path::$npm_cache_path"
+          echo "npm_cache_path=$npm_cache_path" >> $GITHUB_OUTPUT
         id: npm-cache-path
 
       - name: Cache npm packages
