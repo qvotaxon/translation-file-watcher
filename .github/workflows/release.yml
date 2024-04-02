@@ -53,10 +53,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # - name: Cache npm packages
+      #   uses: actions/cache@v4
+      #   with:
+      #     # todo: check for os: ~/ is not valid for windows
+      #     path: |
+      #       if [ "${{ runner.os }}" = "Windows" ]; then
+      #         'C:/.npm'
+      #       else
+      #         '~/.npm'
+      #       fi
+      #     key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
+
+      - name: Determine npm package cache path for os
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            npm_cache_path="C:/npm"
+          else
+            npm_cache_path="$HOME/.npm"
+          fi
+          echo "::set-output name=npm_cache_path::$npm_cache_path"
+        id: npm-cache-path
+
       - name: Cache npm packages
         uses: actions/cache@v4
         with:
-          path: ~/.npm
+          path: ${{ steps.npm-cache-path.outputs.npm_cache_path }}
           key: ${{ runner.os }}-npm-${{ hashFiles('**/src/*.ts') }}
 
       - name: Setup Node.js
