@@ -1,16 +1,19 @@
 <!-- ![Logo](./logo.jpg)
 <small>Generated using CoPilot</small> -->
+![Downloads](https://img.shields.io/visual-studio-marketplace/d/qvotaxon.translation-file-watcher.png?logo=github&branch=main)
+[![Code Size](https://img.shields.io/github/languages/code-size/qvotaxon/translation-file-watcher.png?logo=github&branch=main)](https://github.com/qvotaxon/translation-file-watcher/releases)
+![Visual Studio Code](https://img.shields.io/badge/VS%20Code-^1.61.0-blue.png?logo=github&branch=main)
 
-![Visual Studio Code](https://img.shields.io/badge/VS%20Code-^1.61.0-blue.png)
-![License](https://img.shields.io/badge/License-MIT-blue.png)
-![Downloads](https://img.shields.io/visual-studio-marketplace/d/qvotaxon.translation-file-watcher.png)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/qvotaxon/translation-file-watcher/release.yml?branch=main)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/qvotaxon/translation-file-watcher/release.yml?logo=github&branch=main)
+![Open Issues](https://img.shields.io/github/issues/qvotaxon/translation-file-watcher?logo=github&branch=main)
+![Closed Issues](https://img.shields.io/github/issues-closed/qvotaxon/translation-file-watcher?logo=github&branch=main)
+![Contributors](https://img.shields.io/github/contributors/qvotaxon/translation-file-watcher?logo=github&branch=main)
+[![Languages](https://img.shields.io/github/languages/top/qvotaxon/translation-file-watcher.png?logo=github&branch=main)](https://github.com/qvotaxon/translation-file-watcher/releases)
+
+[![License](https://img.shields.io/github/license/qvotaxon/translation-file-watcher.png?logo=github)](https://github.com/qvotaxon/translation-file-watcher/releases)
 
 <!-- [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_shield) -->
 
-![Open Issues](https://img.shields.io/github/issues/qvotaxon/translation-file-watcher)
-![Closed Issues](https://img.shields.io/github/issues-closed/qvotaxon/translation-file-watcher)
-![Contributors](https://img.shields.io/github/contributors/qvotaxon/translation-file-watcher)
 
 # Translation File Watcher
 
