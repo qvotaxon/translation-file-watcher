@@ -3,11 +3,7 @@ import {
   createSingleFileWatcherForGlob,
   createFileWatcherForEachFileInGlob,
 } from './lib/file-watcher';
-import {
-  arePoFilesLocked,
-  setMasterLock,
-  isMasterLockEnabled,
-} from './lib/file-lock-manager';
+import { FileLockManager } from './lib/FileLockManager';
 import { TaskBarItemType as StatusBarItemType } from './lib/Enums';
 import {
   getConfig,
@@ -31,7 +27,7 @@ import { OutputChannelLogger } from './lib/OutputChannelLogger';
 let statusBarManager: StatusBarManager;
 
 export async function activate(context: vscode.ExtensionContext) {
-  OutputChannelLogger.appendLine(
+  OutputChannelLogger.getInstance().appendLine(
     'Activated Translation File Watcher Extension'
   );
   const statusBarManager = StatusBarManager.getInstance();
@@ -150,18 +146,18 @@ export async function activate(context: vscode.ExtensionContext) {
   const poFileWatchers = createFileWatcherForEachFileInGlob(
     '**/locales/**/*.po',
     handlePOFileChange,
-    isMasterLockEnabled,
-    arePoFilesLocked
+    FileLockManager.getInstance().isMasterLockEnabled,
+    FileLockManager.getInstance().arePoFilesLocked
   );
   const jsonFileWatchers = createFileWatcherForEachFileInGlob(
     '**/locales/**/*.json',
     handleJsonFileChange,
-    isMasterLockEnabled
+    FileLockManager.getInstance().isMasterLockEnabled
   );
   const codeFileWatcher = createSingleFileWatcherForGlob(
     '**/{apps,libs}/**/*.{tsx,ts}',
     handleCodeFileChange,
-    isMasterLockEnabled
+    FileLockManager.getInstance().isMasterLockEnabled
   );
 
   context.subscriptions.push(
@@ -174,7 +170,9 @@ export async function activate(context: vscode.ExtensionContext) {
 vscode.commands.registerCommand(
   'translation-file-watcher.toggleFileWatchers',
   () => {
-    setMasterLock(!isMasterLockEnabled());
+    FileLockManager.getInstance().setMasterLock(
+      !FileLockManager.getInstance().isMasterLockEnabled()
+    );
   }
 );
 
@@ -203,7 +201,7 @@ export async function initializeConfigurationWatcher(
         'logging.enableVerboseLogging',
         false
       );
-      OutputChannelLogger.setVerboseLogging(newValue);
+      OutputChannelLogger.getInstance().setVerboseLogging(newValue);
     }
 
     if (
@@ -245,7 +243,7 @@ export function deactivate() {
   statusBarManager.removeStatusBarItem(StatusBarItemType.JSON);
   statusBarManager.removeStatusBarItem(StatusBarItemType.CODE);
 
-  OutputChannelLogger.appendLine(
+  OutputChannelLogger.getInstance().appendLine(
     'Deactivated Translation File Watcher Extension'
   );
 }
