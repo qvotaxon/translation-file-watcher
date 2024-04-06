@@ -30,7 +30,9 @@ export function createSingleFileWatcherForGlob(
 ): vscode.FileSystemWatcher {
   const fileWatcher = vscode.workspace.createFileSystemWatcher(pattern);
 
-  OutputChannelLogger.appendLine(`Activated File Watcher for: ${pattern}.`);
+  OutputChannelLogger.getInstance().appendLine(
+    `Activated File Watcher for: ${pattern}.`
+  );
 
   fileWatcher.onDidChange((uri) => {
     if (!disableFlags.some((disableFlag) => disableFlag())) {

@@ -53,7 +53,7 @@ export async function executeInBackground(
   let projectRoot = await getProjectRootPath();
 
   // Log the start of the execution
-  OutputChannelLogger.appendLine(
+  OutputChannelLogger.getInstance().appendLine(
     `Executing command: ${command} ${args.join(' ')}`,
     LogVerbosity.Important
   );
@@ -79,7 +79,7 @@ export async function executeInBackground(
       activeOnCancel();
       clearTimeout(debounceTimers.get(getCommandMapKey(command, args)));
       processStatuses.set(getCommandMapKey(command, args), 'canceled');
-      OutputChannelLogger.appendLine(
+      OutputChannelLogger.getInstance().appendLine(
         `Execution of command ${command} ${args.join(' ')} canceled.`,
         LogVerbosity.Important
       );
@@ -100,7 +100,7 @@ export async function executeInBackground(
         const output = data.toString();
         stdout += output;
 
-        OutputChannelLogger.appendLine(output);
+        OutputChannelLogger.getInstance().appendLine(output);
 
         if (
           successMatchSequence &&
@@ -115,12 +115,12 @@ export async function executeInBackground(
         const errorOutput = data.toString();
         stderr += errorOutput;
 
-        OutputChannelLogger.appendLine(errorOutput);
+        OutputChannelLogger.getInstance().appendLine(errorOutput);
       });
 
       childProcess.on('error', (error: any) => {
         processStatuses.set(getCommandMapKey(command, args), 'error');
-        OutputChannelLogger.appendLine(
+        OutputChannelLogger.getInstance().appendLine(
           `Failed to execute command: ${command} ${args.join(
             ' '
           )}, got error: ${error}`,
@@ -134,7 +134,7 @@ export async function executeInBackground(
         clearTimeout(debounceTimers.get(getCommandMapKey(command, args)));
 
         if (exitCode !== null) {
-          OutputChannelLogger.appendLine(
+          OutputChannelLogger.getInstance().appendLine(
             `Command ${command} ${args.join(
               ' '
             )} exited with code: ${exitCode}`,
@@ -147,7 +147,10 @@ export async function executeInBackground(
             ' '
           )} exited with unknown code`;
           processStatuses.set(getCommandMapKey(command, args), 'error');
-          OutputChannelLogger.appendLine(errorMessage, LogVerbosity.Important);
+          OutputChannelLogger.getInstance().appendLine(
+            errorMessage,
+            LogVerbosity.Important
+          );
           reject(new Error(errorMessage));
         }
       });
@@ -165,7 +168,7 @@ export async function executeInBackground(
       getCommandMapKey(command, args),
       setTimeout(() => {
         executeCommand();
-        OutputChannelLogger.appendLine(
+        OutputChannelLogger.getInstance().appendLine(
           `Debounced execution of command: ${command} ${args.join(' ')}`,
           LogVerbosity.Important
         );
