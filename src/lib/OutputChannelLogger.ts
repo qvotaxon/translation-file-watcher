@@ -2,12 +2,12 @@ import { OutputChannel, window } from 'vscode';
 import { LogVerbosity } from './Enums';
 
 export class OutputChannelLogger {
-  private static _verboseLogging = false;
-  private static _outputChannel: OutputChannel;
+  private _verboseLogging = false;
+  private _outputChannel: OutputChannel;
   private static _instance: OutputChannelLogger;
 
   private constructor() {
-    OutputChannelLogger._outputChannel = window.createOutputChannel(
+    this._outputChannel = window.createOutputChannel(
       'Translation File Watcher'
     );
   }
@@ -23,12 +23,12 @@ export class OutputChannelLogger {
    * @param {boolean} verbose Specifies whether to enable verbose logging
    */
   public setVerboseLogging(verbose: boolean) {
-    OutputChannelLogger._verboseLogging = verbose;
+    this._verboseLogging = verbose;
   }
 
   // Function to show the output channel
   public showOutputChannel() {
-    OutputChannelLogger._outputChannel.show();
+    this._outputChannel.show();
   }
 
   /**
@@ -39,13 +39,10 @@ export class OutputChannelLogger {
     message: string,
     verbosity: LogVerbosity = LogVerbosity.Verbose
   ) {
-    if (
-      verbosity === LogVerbosity.Verbose &&
-      OutputChannelLogger._verboseLogging
-    ) {
-      OutputChannelLogger._outputChannel.appendLine(message);
+    if (verbosity === LogVerbosity.Verbose && this._verboseLogging) {
+      this._outputChannel.appendLine(message);
     } else if (verbosity === LogVerbosity.Important) {
-      OutputChannelLogger._outputChannel.appendLine(message);
+      this._outputChannel.appendLine(message);
     }
   }
 }

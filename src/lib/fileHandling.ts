@@ -360,7 +360,7 @@ export async function handleCodeFileChange(
       `--config ${i18nScannerConfigRelativePath}`,
     ];
     try {
-      const exitCode = await executeInBackground(command, args);
+      const executionResult = await executeInBackground(command, args);
 
       statusBarManager.setStatusBarItemText(
         TaskBarItemType.JSON,
@@ -372,13 +372,24 @@ export async function handleCodeFileChange(
       );
 
       OutputChannelLogger.getInstance().appendLine(
-        `Command executed with exit code: ${exitCode}`
+        `Command executed with exit code: ${executionResult.exitCode}`
       );
-    } catch (error) {
+    } catch (error: any) {
       OutputChannelLogger.getInstance().appendLine(
         `Failed to execute command: '${command} ${args}'.\r\nCaught error: ${error}`,
         LogVerbosity.Important
       );
+
+      if (error.code !== 'ABORT_ERR') {
+        statusBarManager.setStatusBarItemText(
+          TaskBarItemType.JSON,
+          '$(eye) JSON'
+        );
+        statusBarManager.setStatusBarItemText(
+          TaskBarItemType.CODE,
+          '$(eye) CODE'
+        );
+      }
     }
   }
 

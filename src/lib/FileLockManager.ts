@@ -15,7 +15,7 @@ export class FileLockManager {
     return FileLockManager.instance;
   }
 
-  public setMasterLock(value: boolean): void {
+  public setMasterLock = (value: boolean): void => {
     this.masterLock = value;
     vscode.window.showInformationMessage(
       `Masterlock: ${this.masterLock ? 'enabled' : 'disabled'}`
@@ -23,9 +23,9 @@ export class FileLockManager {
     OutputChannelLogger.getInstance().appendLine(
       `Set: Masterlock: ${this.masterLock ? 'enabled' : 'disabled'}`
     );
-  }
+  };
 
-  public addPoFilesLock(locale: string): void {
+  public addPoFilesLock = (locale: string): void => {
     let currentCount = this.poFilesLocks.get(locale) || 0;
     this.poFilesLocks.set(locale, currentCount + 1);
     OutputChannelLogger.getInstance().appendLine(
@@ -33,9 +33,9 @@ export class FileLockManager {
         locale
       )}`
     );
-  }
+  };
 
-  public removePoFileLock(locale: string): void {
+  public removePoFileLock = (locale: string): void => {
     let currentCount = this.poFilesLocks.get(locale) || 0;
     if (currentCount > 0) {
       this.poFilesLocks.set(locale, currentCount - 1);
@@ -49,9 +49,9 @@ export class FileLockManager {
         `Po files not locked for locale: ${locale}`
       );
     }
-  }
+  };
 
-  public isPoFileLocked(locale: string): boolean {
+  public isPoFileLocked = (locale: string): boolean => {
     OutputChannelLogger.getInstance().appendLine(
       `Po files locked for locale: ${locale}`
     );
@@ -59,9 +59,9 @@ export class FileLockManager {
     let localeLock = this.poFilesLocks.get(locale);
 
     return localeLock !== undefined && localeLock > 0;
-  }
+  };
 
-  public arePoFilesLocked(): boolean {
+  public arePoFilesLocked = (): boolean => {
     let poFileLockExists = false;
 
     this.poFilesLocks.forEach((poFileLock) => {
@@ -76,13 +76,13 @@ export class FileLockManager {
     );
 
     return this.masterLock || poFileLockExists;
-  }
+  };
 
-  public isMasterLockEnabled(): boolean {
+  public isMasterLockEnabled = (): boolean => {
     OutputChannelLogger.getInstance().appendLine(
       `Master lock is ${this.masterLock ? 'enabled' : 'disabled'}`
     );
 
     return this.masterLock;
-  }
+  };
 }
