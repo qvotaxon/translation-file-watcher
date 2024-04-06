@@ -8,11 +8,7 @@ import {
 } from './fileManagement';
 import path from 'path';
 import { getConfig } from './configurationManagement';
-import {
-  removePoFileLock,
-  addPoFilesLock,
-  isPoFileLocked,
-} from './file-lock-manager';
+import { FileLockManager } from './FileLockManager';
 import { FileType, LogVerbosity, TaskBarItemType } from './Enums';
 import { executeInBackground } from './backgroundProcessExecution';
 import { CallbackOnMatch } from './Types';
@@ -65,27 +61,29 @@ export async function handlePOFileChange(
   const statusBarManager = StatusBarManager.getInstance();
   const { jsonOutputPath, locale } = extractParts(fsPath);
 
-  if (isPoFileLocked(locale)) {
-    OutputChannelLogger.appendLine(`Po file ${locale} locked. Skipping.`);
+  if (FileLockManager.getInstance().isPoFileLocked(locale)) {
+    OutputChannelLogger.getInstance().appendLine(
+      `Po file ${locale} locked. Skipping.`
+    );
     return;
   }
 
   if (isFileModeManual(FileType.Po) && triggeredByFileWatcher) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       'Manual mode enabled for Po files. Skipping.'
     );
     return;
   }
 
   if (hasMergeMarkers(jsonOutputPath) || checkMergeStatus()) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       'File contains Git merge markers. Sorting aborted.',
       LogVerbosity.Important
     );
     return;
   }
 
-  OutputChannelLogger.appendLine(`Po File Changed: ${fsPath}`);
+  OutputChannelLogger.getInstance().appendLine(`Po File Changed: ${fsPath}`);
   statusBarManager.setStatusBarItemText(
     TaskBarItemType.JSON,
     '$(sync~spin) JSON'
@@ -93,7 +91,7 @@ export async function handlePOFileChange(
 
   const successMatchSequence = 'file written';
   const successMatchCallback: CallbackOnMatch = () => {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       `Match found while loocking for ${successMatchSequence}`
     );
 
@@ -113,12 +111,12 @@ export async function handlePOFileChange(
       successMatchSequence,
       successMatchCallback
     );
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       `Command executed with exit code: ${exitCode}`,
       LogVerbosity.Important
     );
   } catch (error) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       `Failed to execute command: ${error}`,
       LogVerbosity.Important
     );
@@ -127,7 +125,7 @@ export async function handlePOFileChange(
   try {
     sortJsonFile(jsonOutputPath);
   } catch (error) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       `Error loading sort-json: ${error}`,
       LogVerbosity.Important
     );
@@ -139,7 +137,7 @@ export async function handleJsonFileChange(
   triggeredByFileWatcher: boolean = true
 ): Promise<void> {
   const statusBarManager = StatusBarManager.getInstance();
-  OutputChannelLogger.appendLine(`Json File Changed: ${fsPath}`);
+  OutputChannelLogger.getInstance().appendLine(`Json File Changed: ${fsPath}`);
 
   const generatePo = getConfig().get<boolean>(
     'fileGeneration.generatePo',
@@ -150,14 +148,14 @@ export async function handleJsonFileChange(
     !generatePo ||
     (isFileModeManual(FileType.Json) && triggeredByFileWatcher)
   ) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       'Either manual mode is enabled for Po files or Po file generation is disabled. Skipping.'
     );
     return;
   }
 
   if (hasMergeMarkers(fsPath) || checkMergeStatus()) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       'File contains Git merge markers. Sorting aborted.',
       LogVerbosity.Important
     );
@@ -169,15 +167,15 @@ export async function handleJsonFileChange(
   statusBarManager.setStatusBarItemText(TaskBarItemType.PO, '$(sync~spin) PO');
 
   const cancelCallback = () => {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       'Removing file lock because task was cancelled.'
     );
-    removePoFileLock(locale);
+    FileLockManager.getInstance().removePoFileLock(locale);
   };
 
   const successMatchSequence = 'file written';
   const successMatchCallback: CallbackOnMatch = () => {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       `Match found while loocking for ${successMatchSequence}`
     );
 
@@ -186,7 +184,7 @@ export async function handleJsonFileChange(
       // TODO: This callback should only be called when writing to the po file is done.
       // So the json file watcher shouldn't be triggered, but it is...
       // As a workaround we wait for one second after the task is finished.
-      removePoFileLock(locale);
+      FileLockManager.getInstance().removePoFileLock(locale);
     }, 250);
   };
   const command = 'npx';
@@ -198,7 +196,7 @@ export async function handleJsonFileChange(
   ];
 
   //TODO: error handling?
-  addPoFilesLock(locale);
+  FileLockManager.getInstance().addPoFilesLock(locale);
 
   try {
     const { stdout, stderr, exitCode } = await executeInBackground(
@@ -210,12 +208,15 @@ export async function handleJsonFileChange(
     );
 
     if (exitCode === 0) {
-      OutputChannelLogger.appendLine(stdout);
+      OutputChannelLogger.getInstance().appendLine(stdout);
     } else {
-      OutputChannelLogger.appendLine(stderr, LogVerbosity.Important);
+      OutputChannelLogger.getInstance().appendLine(
+        stderr,
+        LogVerbosity.Important
+      );
     }
   } catch (error) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       `Failed to execute command: ${error}`,
       LogVerbosity.Important
     );
@@ -234,7 +235,9 @@ function storeFileState(fsPath: string) {
   const previousData = previousFileContents[fsPath as keyof object] || '';
 
   if (currentFileContents[fsPath as keyof object] !== previousData) {
-    OutputChannelLogger.appendLine(`File contents of ${fsPath} changed.`);
+    OutputChannelLogger.getInstance().appendLine(
+      `File contents of ${fsPath} changed.`
+    );
 
     previousFileContents[fsPath as keyof object] =
       currentFileContents[fsPath as keyof object];
@@ -306,14 +309,14 @@ export async function handleCodeFileChange(
 ): Promise<void> {
   const statusBarManager = StatusBarManager.getInstance();
   if (isFileModeManual(FileType.Code) && triggeredByFileWatcher) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       'Manual mode enabled for Po files. Skipping.'
     );
     return;
   }
 
   if (checkMergeStatus()) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       'File contains Git merge markers. Sorting aborted.',
       LogVerbosity.Important
     );
@@ -321,11 +324,13 @@ export async function handleCodeFileChange(
   }
 
   if (fsPath) {
-    OutputChannelLogger.appendLine(
+    OutputChannelLogger.getInstance().appendLine(
       `Code File (**​/*.{ts,tsx}) Changed: ${fsPath}`
     );
   } else {
-    OutputChannelLogger.appendLine(`Manual code change trigger received.`);
+    OutputChannelLogger.getInstance().appendLine(
+      `Manual code change trigger received.`
+    );
   }
 
   updateCurrentFileContents(fsPath!);
@@ -366,11 +371,11 @@ export async function handleCodeFileChange(
         '$(eye) CODE'
       );
 
-      OutputChannelLogger.appendLine(
+      OutputChannelLogger.getInstance().appendLine(
         `Command executed with exit code: ${exitCode}`
       );
     } catch (error) {
-      OutputChannelLogger.appendLine(
+      OutputChannelLogger.getInstance().appendLine(
         `Failed to execute command: '${command} ${args}'.\r\nCaught error: ${error}`,
         LogVerbosity.Important
       );

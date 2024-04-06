@@ -3,18 +3,31 @@ import { LogVerbosity } from './Enums';
 
 export class OutputChannelLogger {
   private static _verboseLogging = false;
-  private static readonly _outputChannel: OutputChannel =
-    window.createOutputChannel('Translation File Watcher');
+  private static _outputChannel: OutputChannel;
+  private static _instance: OutputChannelLogger;
+
+  private constructor() {
+    OutputChannelLogger._outputChannel = window.createOutputChannel(
+      'Translation File Watcher'
+    );
+  }
+
+  public static getInstance(): OutputChannelLogger {
+    if (!OutputChannelLogger._instance) {
+      OutputChannelLogger._instance = new OutputChannelLogger();
+    }
+    return OutputChannelLogger._instance;
+  }
 
   /**
    * @param {boolean} verbose Specifies whether to enable verbose logging
    */
-  public static setVerboseLogging(verbose: boolean) {
+  public setVerboseLogging(verbose: boolean) {
     OutputChannelLogger._verboseLogging = verbose;
   }
 
   // Function to show the output channel
-  public static showOutputChannel() {
+  public showOutputChannel() {
     OutputChannelLogger._outputChannel.show();
   }
 
@@ -22,7 +35,7 @@ export class OutputChannelLogger {
    * @param {string} message The message to log
    * @param {LogVerbosity} [verbosity=LogType.Verbose] Specifies the type of log message
    */
-  public static appendLine(
+  public appendLine(
     message: string,
     verbosity: LogVerbosity = LogVerbosity.Verbose
   ) {
