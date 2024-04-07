@@ -125,8 +125,8 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.codeFileWatcherStatusBarItemClicked',
         () => {
-          fileChangeHandler.handleCodeFileChange(undefined, false),
-            vscode.window.showInformationMessage('Generating JSON files.');
+          fileChangeHandler.handleCodeFileChange(undefined, false);
+          vscode.window.showInformationMessage('Generating JSON files.');
         }
       );
 

@@ -16,7 +16,7 @@ class BackgroundProcessExecutor {
   private processStatuses: Map<string, string> = new Map();
 
   private getCommandMapKey(command: string, args: string[]) {
-    return `${command}${args.join('_').replace(new RegExp(' ', 'g'), '_')}`;
+    return `${command}${args.join('_').replace(/ /g, '_')}`;
   }
 
   private async getProjectRootPath(): Promise<string> {
@@ -112,7 +112,7 @@ class BackgroundProcessExecutor {
           outputChannelManager.appendLine(errorOutput);
         });
 
-        childProcess.on('error', (error: any) => {
+        childProcess.on('error', (error: Error) => {
           this.processStatuses.set(
             this.getCommandMapKey(command, args),
             'error'

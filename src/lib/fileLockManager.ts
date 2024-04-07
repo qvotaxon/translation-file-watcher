@@ -26,7 +26,7 @@ class FileLockManager {
   };
 
   public addPoFilesLock = (locale: string): void => {
-    let currentCount = this.poFilesLocks.get(locale) || 0;
+    let currentCount = this.poFilesLocks.get(locale) ?? 0;
     this.poFilesLocks.set(locale, currentCount + 1);
     outputChannelManager.appendLine(
       `Added 1. Po File Locks Active for locale ${locale}: ${this.poFilesLocks.get(
@@ -36,7 +36,7 @@ class FileLockManager {
   };
 
   public removePoFileLock = (locale: string): void => {
-    let currentCount = this.poFilesLocks.get(locale) || 0;
+    let currentCount = this.poFilesLocks.get(locale) ?? 0;
     if (currentCount > 0) {
       this.poFilesLocks.set(locale, currentCount - 1);
       outputChannelManager.appendLine(
@@ -65,7 +65,6 @@ class FileLockManager {
     this.poFilesLocks.forEach((poFileLock) => {
       if (poFileLock > 0) {
         poFileLockExists = true;
-        return;
       }
     });
 
