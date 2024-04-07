@@ -3,11 +3,11 @@ import vscode from 'vscode';
 import fs from 'fs';
 import { FileType, LogVerbosity, StatusBarItemType } from './Enums';
 import { CallbackOnMatch } from './Types';
-import statusBarManager from './statusBarManager.different';
+import statusBarManager from './statusBarManager';
 import configurationManager from './configurationManager';
 import { JsonObject } from './Interfaces';
 import FileManagement from './fileManagement';
-import fileLockManager from './fileLockManager.different';
+import fileLockManager from './fileLockManager';
 import outputChannelManager from './outputChannelManager';
 import BackgroundProcessExecutor from './backgroundProcessExecutor';
 
