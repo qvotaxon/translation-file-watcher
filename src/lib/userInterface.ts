@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { StatusBarItemType } from './Enums';
-import statusBarManager from './statusBarManager';
+import statusBarManager from './statusBarManager.different';
 
 export function notifyRequiredSettings() {
   vscode.window

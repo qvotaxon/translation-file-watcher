@@ -5,9 +5,9 @@ import {
   initializeStatusBarItems,
 } from './lib/userInterface';
 import configurationManager from './lib/configurationManager';
-import statusBarManager from './lib/statusBarManager';
+import statusBarManager from './lib/statusBarManager.different';
 import fileChangeHandler from './lib/fileChangeHandler';
-import fileLockManager from './lib/fileLockManager';
+import fileLockManager from './lib/fileLockManager.different';
 import FileManagement from './lib/fileManagement';
 import FileWatcherCreator from './lib/fileWatcherCreator';
 import outputChannelManager from './lib/outputChannelManager';
