@@ -307,7 +307,7 @@ class FileChangeHandler {
     FileChangeHandler.storeFileState(fsPath!);
   }
 
-  public static processPOFiles = (
+  public processPOFiles = (
     directory: string,
     triggeredByFileWatcher: boolean,
     callback: (filePath: string, triggeredByFileWatcher: boolean) => void
@@ -316,7 +316,7 @@ class FileChangeHandler {
       const filePath = path.join(directory, file);
       const stat = fs.statSync(filePath);
       if (stat.isDirectory()) {
-        FileChangeHandler.processPOFiles(
+        fileChangeHandler.processPOFiles(
           filePath,
           triggeredByFileWatcher,
           callback
