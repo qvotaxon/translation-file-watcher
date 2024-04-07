@@ -9,7 +9,7 @@ export enum FileType {
   Code = 'code',
 }
 
-export enum TaskBarItemType {
+export enum StatusBarItemType {
   PO,
   JSON,
   CODE,

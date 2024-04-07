@@ -1,36 +1,23 @@
 import * as vscode from 'vscode';
-import {
-  createSingleFileWatcherForGlob,
-  createFileWatcherForEachFileInGlob,
-} from './lib/file-watcher';
-import { FileLockManager } from './lib/FileLockManager';
-import { TaskBarItemType as StatusBarItemType } from './lib/Enums';
-import {
-  getConfig,
-  updateSynchronizedOptions,
-} from './lib/configurationManagement';
-import {
-  processJSONFiles,
-  handleJsonFileChange,
-  processPOFiles,
-  handlePOFileChange,
-  handleCodeFileChange,
-} from './lib/fileHandling';
-import { getPackageJsonRelativePath } from './lib/fileManagement';
+import { StatusBarItemType } from './lib/Enums';
 import {
   notifyRequiredSettings,
   initializeStatusBarItems,
 } from './lib/userInterface';
-import { StatusBarManager } from './lib/StatusBarManager';
-import { OutputChannelLogger } from './lib/OutputChannelLogger';
-
-let statusBarManager: StatusBarManager;
+import configurationManager from './lib/configurationManager';
+import statusBarManager from './lib/statusBarManager';
+import fileChangeHandler from './lib/fileChangeHandler';
+import fileLockManager from './lib/fileLockManager';
+import FileManagement from './lib/fileManagement';
+import FileWatcherCreator from './lib/fileWatcherCreator';
+import outputChannelManager from './lib/outputChannelManager';
 
 export async function activate(context: vscode.ExtensionContext) {
-  OutputChannelLogger.getInstance().appendLine(
+  const fileWatcherCreator: FileWatcherCreator = new FileWatcherCreator();
+
+  outputChannelManager.appendLine(
     'Activated Translation File Watcher Extension'
   );
-  const statusBarManager = StatusBarManager.getInstance();
 
   const myExtension = vscode.extensions.getExtension(
     'qvotaxon.translation-file-watcher'
@@ -52,7 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
   initializeStatusBarItems();
   await initializeConfigurationWatcher(context);
 
-  const packageJsonPath = await getPackageJsonRelativePath();
+  const packageJsonPath = await FileManagement.getPackageJsonRelativePath();
   if (packageJsonPath) {
     statusBarManager.setStatusBarItemCommand(
       StatusBarItemType.PO,
@@ -100,9 +87,9 @@ export async function activate(context: vscode.ExtensionContext) {
   /**
    * TODO> Move to seperate function
    */
-  let localesRelativePath = getConfig().get<string>(
-    'filePaths.localesRelativePath'
-  );
+  let localesRelativePath = configurationManager
+    .getConfig()
+    .get<string>('filePaths.localesRelativePath');
   if (localesRelativePath && packageJsonPath) {
     const localesAbsolutePath = `${
       vscode.workspace.workspaceFolders![0].uri.fsPath
@@ -112,7 +99,11 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.poFileWatcherStatusBarItemClicked',
         () => {
-          processJSONFiles(localesAbsolutePath, false, handleJsonFileChange);
+          fileChangeHandler.processJSONFiles(
+            localesAbsolutePath,
+            false,
+            fileChangeHandler.handleJsonFileChange
+          );
           vscode.window.showInformationMessage('Generating PO files.');
         }
       );
@@ -121,7 +112,11 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.jsonFileWatcherStatusBarItemClicked',
         () => {
-          processPOFiles(localesAbsolutePath, false, handlePOFileChange);
+          fileChangeHandler.processPOFiles(
+            localesAbsolutePath,
+            false,
+            fileChangeHandler.handlePOFileChange
+          );
           vscode.window.showInformationMessage('Generating JSON files.');
         }
       );
@@ -130,7 +125,7 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.codeFileWatcherStatusBarItemClicked',
         () => {
-          handleCodeFileChange(undefined, false),
+          fileChangeHandler.handleCodeFileChange(undefined, false),
             vscode.window.showInformationMessage('Generating JSON files.');
         }
       );
@@ -143,21 +138,22 @@ export async function activate(context: vscode.ExtensionContext) {
   }
   //TODO: use relativeLocalesPath to read po files from. Same for tsx ts files.
 
-  const poFileWatchers = createFileWatcherForEachFileInGlob(
+  const poFileWatchers = fileWatcherCreator.createFileWatcherForEachFileInGlob(
     '**/locales/**/*.po',
-    handlePOFileChange,
-    FileLockManager.getInstance().isMasterLockEnabled,
-    FileLockManager.getInstance().arePoFilesLocked
+    fileChangeHandler.handlePOFileChange,
+    fileLockManager.isMasterLockEnabled,
+    fileLockManager.arePoFilesLocked
   );
-  const jsonFileWatchers = createFileWatcherForEachFileInGlob(
-    '**/locales/**/*.json',
-    handleJsonFileChange,
-    FileLockManager.getInstance().isMasterLockEnabled
-  );
-  const codeFileWatcher = createSingleFileWatcherForGlob(
+  const jsonFileWatchers =
+    fileWatcherCreator.createFileWatcherForEachFileInGlob(
+      '**/locales/**/*.json',
+      fileChangeHandler.handleJsonFileChange,
+      fileLockManager.isMasterLockEnabled
+    );
+  const codeFileWatcher = fileWatcherCreator.createSingleFileWatcherForGlob(
     '**/{apps,libs}/**/*.{tsx,ts}',
-    handleCodeFileChange,
-    FileLockManager.getInstance().isMasterLockEnabled
+    fileChangeHandler.handleCodeFileChange,
+    fileLockManager.isMasterLockEnabled
   );
 
   context.subscriptions.push(
@@ -170,9 +166,7 @@ export async function activate(context: vscode.ExtensionContext) {
 vscode.commands.registerCommand(
   'translation-file-watcher.toggleFileWatchers',
   () => {
-    FileLockManager.getInstance().setMasterLock(
-      !FileLockManager.getInstance().isMasterLockEnabled()
-    );
+    fileLockManager.setMasterLock(!fileLockManager.isMasterLockEnabled());
   }
 );
 
@@ -185,11 +179,10 @@ export async function initializeConfigurationWatcher(
         'translationFileWatcher.fileModes.overallFileMode'
       )
     ) {
-      const newValue = getConfig().get<string>(
-        'fileModes.overallFileMode',
-        'automatic'
-      );
-      await updateSynchronizedOptions(newValue);
+      const newValue = configurationManager
+        .getConfig()
+        .get<string>('fileModes.overallFileMode', 'automatic');
+      await configurationManager.updateSynchronizedOptions(newValue);
     }
 
     if (
@@ -197,11 +190,10 @@ export async function initializeConfigurationWatcher(
         'translationFileWatcher.logging.enableVerboseLogging'
       )
     ) {
-      const newValue = getConfig().get<boolean>(
-        'logging.enableVerboseLogging',
-        false
-      );
-      OutputChannelLogger.getInstance().setVerboseLogging(newValue);
+      const newValue = configurationManager
+        .getConfig()
+        .get<boolean>('logging.enableVerboseLogging', false);
+      outputChannelManager.setVerboseLogging(newValue);
     }
 
     if (
@@ -209,11 +201,9 @@ export async function initializeConfigurationWatcher(
         'translationFileWatcher.fileGeneration.generatePo'
       )
     ) {
-      const newValue = getConfig().get<boolean>(
-        'fileGeneration.generatePo',
-        true
-      );
-      const statusBarManager = StatusBarManager.getInstance();
+      const newValue = configurationManager
+        .getConfig()
+        .get<boolean>('fileGeneration.generatePo', true);
 
       if (newValue) {
         statusBarManager.setStatusBarItemText(
@@ -243,7 +233,7 @@ export function deactivate() {
   statusBarManager.removeStatusBarItem(StatusBarItemType.JSON);
   statusBarManager.removeStatusBarItem(StatusBarItemType.CODE);
 
-  OutputChannelLogger.getInstance().appendLine(
+  outputChannelManager.appendLine(
     'Deactivated Translation File Watcher Extension'
   );
 }

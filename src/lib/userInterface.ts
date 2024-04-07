@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { StatusBarManager } from './StatusBarManager';
-import { TaskBarItemType } from './Enums';
+import { StatusBarItemType } from './Enums';
+import statusBarManager from './statusBarManager';
 
 export function notifyRequiredSettings() {
   vscode.window
@@ -19,19 +19,18 @@ export function notifyRequiredSettings() {
 }
 
 export function initializeStatusBarItems() {
-  const statusBarManager = StatusBarManager.getInstance();
   const poStatusBarItem = statusBarManager.addStatusBarItem(
-    TaskBarItemType.PO,
+    StatusBarItemType.PO,
     vscode.StatusBarAlignment.Left,
     100
   );
   const jsonStatusBarItem = statusBarManager.addStatusBarItem(
-    TaskBarItemType.JSON,
+    StatusBarItemType.JSON,
     vscode.StatusBarAlignment.Left,
     90
   );
   const codeStatusBarItem = statusBarManager.addStatusBarItem(
-    TaskBarItemType.CODE,
+    StatusBarItemType.CODE,
     vscode.StatusBarAlignment.Left,
     80
   );
