@@ -54,21 +54,6 @@
       {
         "id": "fileModes",
         "title": "File Modes",
-        "properties": {
-          "translationFileWatcher.fileModes.overallFileMode": {
-            "order": 0,
-            "type": "string",
-            "default": "automatic",
-            "enum": [
-              "manual",
-              "automatic"
-            ],
-            "enumDescriptions": [
-              "Manual",
-              "Automatic"
-            ],
-            "description": "Choose whether to enable file watchers (Automatic) or click icons on the status bar icons (Manual) to start file conversions and key extraction."
-          },
           "translationFileWatcher.fileModes.poFileMode": {
             "type": "string",
             "default": "automatic",
