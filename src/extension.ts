@@ -37,7 +37,7 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   initializeStatusBarItems();
-  await initializeConfigurationWatcher(context);
+  await configurationManager.initializeConfigurationWatcher(context);
 
   const packageJsonPath = await FileManagement.getPackageJsonRelativePath();
   if (packageJsonPath) {
@@ -169,64 +169,6 @@ vscode.commands.registerCommand(
     fileLockManager.setMasterLock(!fileLockManager.isMasterLockEnabled());
   }
 );
-
-export async function initializeConfigurationWatcher(
-  context: vscode.ExtensionContext
-) {
-  vscode.workspace.onDidChangeConfiguration(async (event) => {
-    if (
-      event.affectsConfiguration(
-        'translationFileWatcher.fileModes.overallFileMode'
-      )
-    ) {
-      const newValue = configurationManager
-        .getConfig()
-        .get<string>('fileModes.overallFileMode', 'automatic');
-      await configurationManager.updateSynchronizedOptions(newValue);
-    }
-
-    if (
-      event.affectsConfiguration(
-        'translationFileWatcher.logging.enableVerboseLogging'
-      )
-    ) {
-      const newValue = configurationManager
-        .getConfig()
-        .get<boolean>('logging.enableVerboseLogging', false);
-      outputChannelManager.setVerboseLogging(newValue);
-    }
-
-    if (
-      event.affectsConfiguration(
-        'translationFileWatcher.fileGeneration.generatePo'
-      )
-    ) {
-      const newValue = configurationManager
-        .getConfig()
-        .get<boolean>('fileGeneration.generatePo', true);
-
-      if (newValue) {
-        statusBarManager.setStatusBarItemText(
-          StatusBarItemType.PO,
-          '$(eye) PO'
-        );
-        statusBarManager.setStatusBarItemTooltip(
-          StatusBarItemType.PO,
-          'Watching PO files (click to generate PO files)'
-        );
-      } else {
-        statusBarManager.setStatusBarItemText(
-          StatusBarItemType.PO,
-          '$(eye-closed) PO'
-        );
-        statusBarManager.setStatusBarItemTooltip(
-          StatusBarItemType.PO,
-          'File watcher disabled because of settings.'
-        );
-      }
-    }
-  });
-}
 
 export function deactivate() {
   statusBarManager.removeStatusBarItem(StatusBarItemType.PO);
