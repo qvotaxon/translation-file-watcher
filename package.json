@@ -54,6 +54,7 @@
       {
         "id": "fileModes",
         "title": "File Modes",
+        "properties": {
           "translationFileWatcher.fileModes.poFileMode": {
             "type": "string",
             "default": "automatic",
