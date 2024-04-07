@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { OutputChannelLogger } from './OutputChannelLogger';
+import outputChannelManager from './outputChannelManager';
 
-export class FileLockManager {
+class FileLockManager {
   private static instance: FileLockManager;
   private masterLock: boolean = false;
   private poFilesLocks: Map<string, number> = new Map<string, number>();
@@ -20,15 +20,15 @@ export class FileLockManager {
     vscode.window.showInformationMessage(
       `Masterlock: ${this.masterLock ? 'enabled' : 'disabled'}`
     );
-    OutputChannelLogger.getInstance().appendLine(
+    outputChannelManager.appendLine(
       `Set: Masterlock: ${this.masterLock ? 'enabled' : 'disabled'}`
     );
   };
 
   public addPoFilesLock = (locale: string): void => {
-    let currentCount = this.poFilesLocks.get(locale) || 0;
+    let currentCount = this.poFilesLocks.get(locale) ?? 0;
     this.poFilesLocks.set(locale, currentCount + 1);
-    OutputChannelLogger.getInstance().appendLine(
+    outputChannelManager.appendLine(
       `Added 1. Po File Locks Active for locale ${locale}: ${this.poFilesLocks.get(
         locale
       )}`
@@ -36,25 +36,23 @@ export class FileLockManager {
   };
 
   public removePoFileLock = (locale: string): void => {
-    let currentCount = this.poFilesLocks.get(locale) || 0;
+    let currentCount = this.poFilesLocks.get(locale) ?? 0;
     if (currentCount > 0) {
       this.poFilesLocks.set(locale, currentCount - 1);
-      OutputChannelLogger.getInstance().appendLine(
+      outputChannelManager.appendLine(
         `Removed 1. Po File Locks Active for locale ${locale}: ${this.poFilesLocks.get(
           locale
         )}`
       );
     } else {
-      OutputChannelLogger.getInstance().appendLine(
+      outputChannelManager.appendLine(
         `Po files not locked for locale: ${locale}`
       );
     }
   };
 
   public isPoFileLocked = (locale: string): boolean => {
-    OutputChannelLogger.getInstance().appendLine(
-      `Po files locked for locale: ${locale}`
-    );
+    outputChannelManager.appendLine(`Po files locked for locale: ${locale}`);
 
     let localeLock = this.poFilesLocks.get(locale);
 
@@ -67,11 +65,10 @@ export class FileLockManager {
     this.poFilesLocks.forEach((poFileLock) => {
       if (poFileLock > 0) {
         poFileLockExists = true;
-        return;
       }
     });
 
-    OutputChannelLogger.getInstance().appendLine(
+    outputChannelManager.appendLine(
       `Po files locked: ${this.masterLock || poFileLockExists}`
     );
 
@@ -79,10 +76,13 @@ export class FileLockManager {
   };
 
   public isMasterLockEnabled = (): boolean => {
-    OutputChannelLogger.getInstance().appendLine(
+    outputChannelManager.appendLine(
       `Master lock is ${this.masterLock ? 'enabled' : 'disabled'}`
     );
 
     return this.masterLock;
   };
 }
+
+const fileLockManager = FileLockManager.getInstance();
+export default fileLockManager;

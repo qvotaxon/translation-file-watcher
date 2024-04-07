@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { TaskBarItemType as StatusBarItemType } from './Enums';
+import { StatusBarItemType } from './Enums';
 
-export class StatusBarManager {
+class StatusBarManager {
   private static _instance: StatusBarManager;
   private _statusBarItemMap: Map<StatusBarItemType, vscode.StatusBarItem>;
 
@@ -84,3 +84,6 @@ export class StatusBarManager {
     }
   }
 }
+
+const statusBarManager = StatusBarManager.getInstance();
+export default statusBarManager;

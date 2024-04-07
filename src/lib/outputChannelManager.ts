@@ -1,10 +1,10 @@
 import { OutputChannel, window } from 'vscode';
 import { LogVerbosity } from './Enums';
 
-export class OutputChannelLogger {
+class OutputChannelManager {
   private _verboseLogging = false;
   private _outputChannel: OutputChannel;
-  private static _instance: OutputChannelLogger;
+  private static _instance: OutputChannelManager;
 
   private constructor() {
     this._outputChannel = window.createOutputChannel(
@@ -12,11 +12,11 @@ export class OutputChannelLogger {
     );
   }
 
-  public static getInstance(): OutputChannelLogger {
-    if (!OutputChannelLogger._instance) {
-      OutputChannelLogger._instance = new OutputChannelLogger();
+  public static getInstance(): OutputChannelManager {
+    if (!OutputChannelManager._instance) {
+      OutputChannelManager._instance = new OutputChannelManager();
     }
-    return OutputChannelLogger._instance;
+    return OutputChannelManager._instance;
   }
 
   /**
@@ -46,3 +46,6 @@ export class OutputChannelLogger {
     }
   }
 }
+
+const outputChannelManager = OutputChannelManager.getInstance();
+export default outputChannelManager;
