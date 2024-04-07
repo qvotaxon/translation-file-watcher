@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.11.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.10.1...v1.11.0) (2024-04-07)
+
+
+### Features
+
+* remove overall file watch mode ([#67](https://github.com/qvotaxon/translation-file-watcher/issues/67)) ([356d608](https://github.com/qvotaxon/translation-file-watcher/commit/356d608a7bb8615bb692308c0cda94267535dfab))
+
+Overall file watch mode configuration has been removed, since it's not really needed. It's still possible to set the individual file watch modes.
+
 ## [1.10.1](https://github.com/qvotaxon/translation-file-watcher/compare/v1.10.0...v1.10.1) (2024-04-01)
 
 ### Features
