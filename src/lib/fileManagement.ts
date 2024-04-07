@@ -5,9 +5,6 @@ import configurationManager from './configurationManager';
 
 class FileManagement {
   public static isFileModeManual(fileType: FileType) {
-    const overallFileMode = configurationManager
-      .getConfig()
-      .get<FileMode>('fileModes.overallFileMode', FileMode.Automatic);
     const poFileMode = configurationManager
       .getConfig()
       .get<FileMode>('fileModes.poFileMode', FileMode.Automatic);
@@ -21,16 +18,14 @@ class FileManagement {
     switch (fileType) {
       case FileType.Po:
         return (
-          overallFileMode === FileMode.Manual || poFileMode === FileMode.Manual
+          poFileMode === FileMode.Manual
         );
       case FileType.Json:
         return (
-          overallFileMode === FileMode.Manual ||
           jsonFileMode === FileMode.Manual
         );
       case FileType.Code:
         return (
-          overallFileMode === FileMode.Manual ||
           codeFileMode === FileMode.Manual
         );
       default:
