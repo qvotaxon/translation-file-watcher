@@ -137,16 +137,19 @@ export async function activate(context: vscode.ExtensionContext) {
     );
   }
   //TODO: use relativeLocalesPath to read po files from. Same for tsx ts files.
+  await fileChangeHandler.initializeInitialFileContentsAsync(
+    '**/{apps,libs}/**/*.{tsx,ts}'
+  );
 
   const poFileWatchers = fileWatcherCreator.createFileWatcherForEachFileInGlob(
-    '**/locales/**/*.po',
+    `${localesRelativePath}/**/locales/**/*.po`,
     fileChangeHandler.handlePOFileChange,
     fileLockManager.isMasterLockEnabled,
     fileLockManager.arePoFilesLocked
   );
   const jsonFileWatchers =
     fileWatcherCreator.createFileWatcherForEachFileInGlob(
-      '**/locales/**/*.json',
+      `${localesRelativePath}/**/locales/**/*.json`,
       fileChangeHandler.handleJsonFileChange,
       fileLockManager.isMasterLockEnabled
     );
