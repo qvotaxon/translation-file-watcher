@@ -9,6 +9,7 @@
 ![Closed Issues](https://img.shields.io/github/issues-closed/qvotaxon/translation-file-watcher?logo=github&branch=main)
 ![Contributors](https://img.shields.io/github/contributors/qvotaxon/translation-file-watcher?logo=github&branch=main)
 [![Languages](https://img.shields.io/github/languages/top/qvotaxon/translation-file-watcher.png?logo=github&branch=main)](https://github.com/qvotaxon/translation-file-watcher/releases)
+![Latest version](https://img.shields.io/github/package-json/v/qvotaxon/translation-file-watcher)
 
 [![License](https://img.shields.io/github/license/qvotaxon/translation-file-watcher.png?logo=github)](https://github.com/qvotaxon/translation-file-watcher/releases)
 
