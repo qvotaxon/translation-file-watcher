@@ -237,7 +237,7 @@ class FileChangeHandler {
       outputChannelManager.appendLine(`Manual code change trigger received.`);
     }
 
-    FileChangeHandler.updatecurrentFileContents(fsPath!);
+    FileChangeHandler.updateCurrentFileContents(fsPath!);
 
     const fileChangeOccurred =
       FileChangeHandler.currentFileContents[fsPath as keyof object] !==
@@ -348,6 +348,32 @@ class FileChangeHandler {
     });
   };
 
+  public async initializeInitialFileContentsAsync(pattern: vscode.GlobPattern) {
+    vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Window,
+        title: 'Initializing file caches',
+      },
+      async () => {
+        try {
+          const fileUris = await vscode.workspace.findFiles(
+            pattern,
+            '**​/{node_modules,.git,.next}/**'
+          );
+
+          fileUris.forEach((fileUri) => {
+            FileChangeHandler.updatePreviousFileContents(fileUri.fsPath);
+          });
+        } catch (error) {
+          console.error('Error initializing initial file contents:', error);
+          vscode.window.showErrorMessage(
+            'Error initializing initial file contents'
+          );
+        }
+      }
+    );
+  }
+
   private static checkMergeStatus = (): boolean => {
     const mergeHeadPath =
       vscode.workspace.workspaceFolders![0].uri.fsPath + '/../.git/MERGE_HEAD';
@@ -387,7 +413,13 @@ class FileChangeHandler {
     return sortedObj;
   };
 
-  private static updatecurrentFileContents = (fsPath: string) => {
+  private static updatePreviousFileContents = (fsPath: string) => {
+    const fileContent = fs.readFileSync(fsPath, { encoding: 'utf8' });
+    FileChangeHandler.previousFileContents[fsPath as keyof object] =
+      fileContent;
+  };
+
+  private static updateCurrentFileContents = (fsPath: string) => {
     const fileContent = fs.readFileSync(fsPath, { encoding: 'utf8' });
     FileChangeHandler.currentFileContents[fsPath as keyof object] = fileContent;
   };
