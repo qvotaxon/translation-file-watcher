@@ -10,6 +10,7 @@ import FileManagement from './fileManagement';
 import fileLockManager from './fileLockManager';
 import outputChannelManager from './outputChannelManager';
 import BackgroundProcessExecutor from './backgroundProcessExecutor';
+import FileUtilities from './fileUtilities';
 
 class FileChangeHandler {
   private static instance: FileChangeHandler;
@@ -118,9 +119,10 @@ class FileChangeHandler {
   ): Promise<void> {
     outputChannelManager.appendLine(`Json File Changed: ${fsPath}`);
 
-    const generatePo = configurationManager
-      .getConfig()
-      .get<boolean>('fileGeneration.generatePo', true);
+    const generatePo = configurationManager.getValue<boolean>(
+      'fileGeneration.generatePo',
+      true
+    );
 
     if (
       !generatePo ||
@@ -254,44 +256,23 @@ class FileChangeHandler {
         '$(search) CODE'
       );
 
-      const i18nScannerConfigRelativePath = configurationManager
-        .getConfig()
-        .get<string>(
-          'i18nScannerConfigRelativePath',
-          'i18next-scanner.config.js'
-        );
-      const command = 'npx';
-      const args = [
-        'i18next-scanner',
-        // `"${uri.fsPath}"`, //TODO: nogmaals kijken of per file idd net zo snel is als hele project. Wel eerst removeUnusedKeys uitzetten.
-        `--config ${i18nScannerConfigRelativePath}`,
-      ];
-      try {
-        const executionResult =
-          await FileChangeHandler.backgroundProcessExecutor.executeInBackground(
-            command,
-            args
-          );
+      const i18nScannerConfigAbsolutePath =
+        FileUtilities.getFilePathInWorkspace('i18next-scanner.config.js');
 
-        statusBarManager.setStatusBarItemText(
-          StatusBarItemType.JSON,
-          '$(eye) JSON'
-        );
-        statusBarManager.setStatusBarItemText(
-          StatusBarItemType.CODE,
-          '$(eye) CODE'
-        );
+      if (i18nScannerConfigAbsolutePath) {
+        const command = 'npx';
+        const args = [
+          'i18next-scanner',
+          // `"${uri.fsPath}"`, //TODO: nogmaals kijken of per file idd net zo snel is als hele project. Wel eerst removeUnusedKeys uitzetten.
+          `--config "${i18nScannerConfigAbsolutePath}"`,
+        ];
+        try {
+          const executionResult =
+            await FileChangeHandler.backgroundProcessExecutor.executeInBackground(
+              command,
+              args
+            );
 
-        outputChannelManager.appendLine(
-          `Command executed with exit code: ${executionResult.exitCode}`
-        );
-      } catch (error: any) {
-        outputChannelManager.appendLine(
-          `Failed to execute command: '${command} ${args}'.\r\nCaught error: ${error}`,
-          LogVerbosity.Important
-        );
-
-        if (error.code !== 'ABORT_ERR') {
           statusBarManager.setStatusBarItemText(
             StatusBarItemType.JSON,
             '$(eye) JSON'
@@ -300,6 +281,26 @@ class FileChangeHandler {
             StatusBarItemType.CODE,
             '$(eye) CODE'
           );
+
+          outputChannelManager.appendLine(
+            `Command executed with exit code: ${executionResult.exitCode}`
+          );
+        } catch (error: any) {
+          outputChannelManager.appendLine(
+            `Failed to execute command: '${command} ${args}'.\r\nCaught error: ${error}`,
+            LogVerbosity.Important
+          );
+
+          if (error.code !== 'ABORT_ERR') {
+            statusBarManager.setStatusBarItemText(
+              StatusBarItemType.JSON,
+              '$(eye) JSON'
+            );
+            statusBarManager.setStatusBarItemText(
+              StatusBarItemType.CODE,
+              '$(eye) CODE'
+            );
+          }
         }
       }
     }
