@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.11.1](https://github.com/qvotaxon/translation-file-watcher/compare/v1.11.0...v1.11.1) (2024-04-13)
+
+
+### Bug Fixes
+
+* **config:** simplify config ([#70](https://github.com/qvotaxon/translation-file-watcher/issues/70)) ([fba876c](https://github.com/qvotaxon/translation-file-watcher/commit/fba876ca3b2d0a474406a96c0a4ae65307efe5e9))
+
+
+### Performance Improvements
+
+* initialize file cache on startup ([758a90c](https://github.com/qvotaxon/translation-file-watcher/commit/758a90c78b6ae0c60fd4968c85a6cb422178677e))
+
 ## [1.11.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.10.1...v1.11.0) (2024-04-07)
 
 
