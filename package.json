@@ -25,11 +25,6 @@
         "id": "paths",
         "title": "File Paths",
         "properties": {
-          "translationFileWatcher.filePaths.i18nScannerConfigRelativePath": {
-            "type": "string",
-            "default": "i18next-scanner.config.js",
-            "description": "Path relative from the root of the workspace to the i18n-next scanner configuration file (i18next-scanner.config.js)."
-          },
           "translationFileWatcher.filePaths.packageJsonRelativePath": {
             "type": "string",
             "description": "Relative path to the project's package.json file. This location serves as the root for all other commands and configurations."

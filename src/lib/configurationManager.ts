@@ -45,9 +45,10 @@ class ConfigurationManager {
           'translationFileWatcher.logging.enableVerboseLogging'
         )
       ) {
-        const newValue = configurationManager
-          .getConfig()
-          .get<boolean>('logging.enableVerboseLogging', false);
+        const newValue = configurationManager.getValue<boolean>(
+          'logging.enableVerboseLogging',
+          false
+        )!;
         outputChannelManager.setVerboseLogging(newValue);
       }
 
@@ -56,9 +57,10 @@ class ConfigurationManager {
           'translationFileWatcher.fileGeneration.generatePo'
         )
       ) {
-        const newValue = configurationManager
-          .getConfig()
-          .get<boolean>('fileGeneration.generatePo', true);
+        const newValue = this.getValue<boolean>(
+          'fileGeneration.generatePo',
+          true
+        );
 
         if (newValue) {
           statusBarManager.setStatusBarItemText(
@@ -83,8 +85,15 @@ class ConfigurationManager {
     });
   }
 
-  public getConfig(): vscode.WorkspaceConfiguration {
-    return vscode.workspace.getConfiguration('translationFileWatcher');
+  public getValue<T>(
+    configurationKey: string,
+    defaultValue?: T
+  ): T | undefined {
+    if (defaultValue) {
+      return this.config.get<T>(configurationKey, defaultValue);
+    }
+
+    return this.config.get<T>(configurationKey);
   }
 }
 

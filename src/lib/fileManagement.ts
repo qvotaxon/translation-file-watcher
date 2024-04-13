@@ -5,29 +5,26 @@ import configurationManager from './configurationManager';
 
 class FileManagement {
   public static isFileModeManual(fileType: FileType) {
-    const poFileMode = configurationManager
-      .getConfig()
-      .get<FileMode>('fileModes.poFileMode', FileMode.Automatic);
-    const jsonFileMode = configurationManager
-      .getConfig()
-      .get<FileMode>('fileModes.jsonFileMode', FileMode.Automatic);
-    const codeFileMode = configurationManager
-      .getConfig()
-      .get<FileMode>('fileModes.codeFileMode', FileMode.Automatic);
+    const poFileMode = configurationManager.getValue<FileMode>(
+      'fileModes.poFileMode',
+      FileMode.Automatic
+    );
+    const jsonFileMode = configurationManager.getValue<FileMode>(
+      'fileModes.jsonFileMode',
+      FileMode.Automatic
+    );
+    const codeFileMode = configurationManager.getValue<FileMode>(
+      'fileModes.codeFileMode',
+      FileMode.Automatic
+    );
 
     switch (fileType) {
       case FileType.Po:
-        return (
-          poFileMode === FileMode.Manual
-        );
+        return poFileMode === FileMode.Manual;
       case FileType.Json:
-        return (
-          jsonFileMode === FileMode.Manual
-        );
+        return jsonFileMode === FileMode.Manual;
       case FileType.Code:
-        return (
-          codeFileMode === FileMode.Manual
-        );
+        return codeFileMode === FileMode.Manual;
       default:
         return false;
     }
@@ -65,9 +62,9 @@ class FileManagement {
   public static async getPackageJsonRelativePath(): Promise<
     string | undefined
   > {
-    const packageJsonRelativePath = configurationManager
-      .getConfig()
-      .get<string>('filePaths.packageJsonRelativePath');
+    const packageJsonRelativePath = configurationManager.getValue<string>(
+      'filePaths.packageJsonRelativePath'
+    );
     const packageJsonAbsolutePath = `${
       vscode.workspace.workspaceFolders![0].uri.fsPath
     }\\${packageJsonRelativePath}`;

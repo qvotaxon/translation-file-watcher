@@ -87,9 +87,9 @@ export async function activate(context: vscode.ExtensionContext) {
   /**
    * TODO> Move to seperate function
    */
-  let localesRelativePath = configurationManager
-    .getConfig()
-    .get<string>('filePaths.localesRelativePath');
+  let localesRelativePath = configurationManager.getValue<string>(
+    'filePaths.localesRelativePath'
+  );
   if (localesRelativePath && packageJsonPath) {
     const localesAbsolutePath = `${
       vscode.workspace.workspaceFolders![0].uri.fsPath
