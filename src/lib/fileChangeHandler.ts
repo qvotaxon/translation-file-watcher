@@ -18,11 +18,16 @@ class FileChangeHandler {
   private static currentFileContents: string[] = [];
   private static backgroundProcessExecutor: BackgroundProcessExecutor =
     new BackgroundProcessExecutor();
+  private static i18nScannerConfigAbsolutePath: string;
 
   private constructor() {}
 
   public static getInstance(): FileChangeHandler {
     if (!FileChangeHandler.instance) {
+      //TODO: move logic
+      FileChangeHandler.i18nScannerConfigAbsolutePath =
+        FileUtilities.getFilePathInWorkspace('i18next-scanner.config.js')!;
+
       FileChangeHandler.instance = new FileChangeHandler();
     }
     return FileChangeHandler.instance;
@@ -256,15 +261,12 @@ class FileChangeHandler {
         '$(search) CODE'
       );
 
-      const i18nScannerConfigAbsolutePath =
-        FileUtilities.getFilePathInWorkspace('i18next-scanner.config.js');
-
-      if (i18nScannerConfigAbsolutePath) {
+      if (FileChangeHandler.i18nScannerConfigAbsolutePath) {
         const command = 'npx';
         const args = [
           'i18next-scanner',
           // `"${uri.fsPath}"`, //TODO: nogmaals kijken of per file idd net zo snel is als hele project. Wel eerst removeUnusedKeys uitzetten.
-          `--config "${i18nScannerConfigAbsolutePath}"`,
+          `--config "${FileChangeHandler.i18nScannerConfigAbsolutePath}"`,
         ];
         try {
           const executionResult =
