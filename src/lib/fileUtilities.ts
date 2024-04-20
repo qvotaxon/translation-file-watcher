@@ -56,6 +56,48 @@ class FileUtilities {
     );
     return null;
   }
+
+  public static async readFileContentsAsync(filePath: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
+
+  public static async writeJsonToFileAsync(
+    filePath: string,
+    data: any
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8', (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  public static async writePoToFileAsync(
+    filePath: string,
+    poContents: string
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      fs.writeFile(filePath, poContents, 'utf8', (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
 }
 
 export default FileUtilities;
