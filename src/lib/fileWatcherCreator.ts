@@ -2,43 +2,48 @@ import * as vscode from 'vscode';
 import outputChannelManager from './outputChannelManager';
 
 class FileWatcherCreator {
-  public createSingleFileWatcherForGlob = (
+  public createSingleFileWatcherForGlobAsync = async (
     pattern: vscode.GlobPattern,
     onChange: (fsPath: string) => void,
     ...disableFlags: (() => boolean)[]
-  ): vscode.FileSystemWatcher => {
-    const fileWatcher = vscode.workspace.createFileSystemWatcher(pattern);
+  ): Promise<vscode.FileSystemWatcher> => {
+    return new Promise<vscode.FileSystemWatcher>((resolve, reject) => {
+      const fileWatcher = vscode.workspace.createFileSystemWatcher(pattern);
 
-    outputChannelManager.appendLine(
-      `Activated File Watcher for: ${pattern.valueOf}.`
-    );
+      outputChannelManager.appendLine(
+        `Activated File Watcher for: ${pattern.valueOf}.`
+      );
 
-    fileWatcher.onDidChange((uri) => {
-      if (!disableFlags.some((disableFlag) => disableFlag())) {
-        onChange(uri.fsPath);
-      }
+      fileWatcher.onDidChange((uri) => {
+        if (!disableFlags.some((disableFlag) => disableFlag())) {
+          onChange(uri.fsPath);
+        }
+      });
+
+      resolve(fileWatcher);
     });
-
-    return fileWatcher;
   };
 
-  public createFileWatcherForEachFileInGlob(
+  public async createFileWatcherForEachFileInGlobAsync(
     pattern: vscode.GlobPattern,
     onChange: (fsPath: string) => void,
     ...disableFlags: (() => boolean)[]
-  ): vscode.FileSystemWatcher[] {
+  ): Promise<vscode.FileSystemWatcher[]> {
+    const fileURIs = await vscode.workspace.findFiles(pattern);
     const fileWatchers: vscode.FileSystemWatcher[] = [];
-    vscode.workspace.findFiles(pattern).then((fileURIs) => {
-      fileURIs.forEach((fileURI) => {
+
+    await Promise.all(
+      fileURIs.map(async (fileURI) => {
         const filePath = fileURI.fsPath;
-        const fileWatcher = this.createSingleFileWatcherForGlob(
+        const fileWatcher = await this.createSingleFileWatcherForGlobAsync(
           filePath,
           onChange,
           ...disableFlags
         );
         fileWatchers.push(fileWatcher);
-      });
-    });
+      })
+    );
+
     return fileWatchers;
   }
 }
