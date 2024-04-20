@@ -136,28 +136,35 @@ export async function activate(context: vscode.ExtensionContext) {
       codeFileWatcherStatusBarItemClickedCommand
     );
   }
+
+  const codeFileGlobPattern = '**/{apps,libs}/**/*.{tsx,ts}';
+  const poFileGlobPattern = `${localesRelativePath}/**/*.po`;
+  const jsonFileGlobPattern = `${localesRelativePath}/**/*.json`;
+
   //TODO: use relativeLocalesPath to read po files from. Same for tsx ts files.
   await fileChangeHandler.initializeInitialFileContentsAsync(
-    '**/{apps,libs}/**/*.{tsx,ts}'
+    codeFileGlobPattern
   );
 
-  const poFileWatchers = fileWatcherCreator.createFileWatcherForEachFileInGlob(
-    `${localesRelativePath}/**/locales/**/*.po`,
-    fileChangeHandler.handlePOFileChange,
-    fileLockManager.isMasterLockEnabled,
-    fileLockManager.arePoFilesLocked
-  );
+  const poFileWatchers =
+    await fileWatcherCreator.createFileWatcherForEachFileInGlobAsync(
+      poFileGlobPattern,
+      fileChangeHandler.handlePOFileChange,
+      fileLockManager.isMasterLockEnabled,
+      fileLockManager.arePoFilesLocked
+    );
   const jsonFileWatchers =
-    fileWatcherCreator.createFileWatcherForEachFileInGlob(
-      `${localesRelativePath}/**/locales/**/*.json`,
+    await fileWatcherCreator.createFileWatcherForEachFileInGlobAsync(
+      jsonFileGlobPattern,
       fileChangeHandler.handleJsonFileChange,
       fileLockManager.isMasterLockEnabled
     );
-  const codeFileWatcher = fileWatcherCreator.createSingleFileWatcherForGlob(
-    '**/{apps,libs}/**/*.{tsx,ts}',
-    fileChangeHandler.handleCodeFileChange,
-    fileLockManager.isMasterLockEnabled
-  );
+  const codeFileWatcher =
+    await fileWatcherCreator.createSingleFileWatcherForGlobAsync(
+      codeFileGlobPattern,
+      fileChangeHandler.handleCodeFileChange,
+      fileLockManager.isMasterLockEnabled
+    );
 
   context.subscriptions.push(
     ...poFileWatchers,
