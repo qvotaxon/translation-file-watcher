@@ -88,7 +88,7 @@ class FileChangeHandler {
     const po = await FileUtilities.readFileContentsAsync(fsPath);
     const res = po2i18next(po, { compatibilityJSON: 'v3' });
     await FileUtilities.writeJsonToFileAsync(jsonOutputPath, res);
-
+    //bumping version
     statusBarManager.setStatusBarItemText(
       StatusBarItemType.JSON,
       '$(eye) JSON'
