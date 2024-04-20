@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.2](https://github.com/qvotaxon/translation-file-watcher/compare/v1.11.1...v1.11.2) (2024-04-20)
+
+
+### Performance Improvements
+
+* improve file conversion speed ([#78](https://github.com/qvotaxon/translation-file-watcher/issues/78)) ([b0990bb](https://github.com/qvotaxon/translation-file-watcher/commit/b0990bb4faaacc32fe961c7fcee8d2aa54863b3a))
+
 ## [1.11.1](https://github.com/qvotaxon/translation-file-watcher/compare/v1.11.0...v1.11.1) (2024-04-13)
 
 
