@@ -21,7 +21,7 @@ class BackgroundProcessExecutor {
 
   private async getProjectRootPath(): Promise<string> {
     if (!this.projectRootPath) {
-      const packageJsonPath = await FileManagement.getPackageJsonRelativePath();
+      const packageJsonPath = await FileManagement.getPackageJsonAbsolutePath();
       this.projectRootPath = path.dirname(packageJsonPath!);
     }
     return this.projectRootPath;
