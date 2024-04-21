@@ -74,7 +74,7 @@ class FileUtilities {
     data: any
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8', (err) => {
+      fs.writeFile(filePath, JSON.stringify(data, null, 4), 'utf8', (err) => {
         if (err) {
           reject(err);
         } else {
