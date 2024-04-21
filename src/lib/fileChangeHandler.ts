@@ -11,8 +11,7 @@ import fileLockManager from './fileLockManager';
 import outputChannelManager from './outputChannelManager';
 import BackgroundProcessExecutor from './backgroundProcessExecutor';
 import FileUtilities from './fileUtilities';
-import po2i18next from 'gettext-converter/po2i18next';
-import i18next2po from 'gettext-converter/i18next2po';
+import { po2i18next, i18next2po } from 'gettext-converter';
 
 class FileChangeHandler {
   private static instance: FileChangeHandler;
@@ -88,48 +87,11 @@ class FileChangeHandler {
     const po = await FileUtilities.readFileContentsAsync(fsPath);
     const res = po2i18next(po, { compatibilityJSON: 'v3' });
     await FileUtilities.writeJsonToFileAsync(jsonOutputPath, res);
-    //bumping version
+
     statusBarManager.setStatusBarItemText(
       StatusBarItemType.JSON,
       '$(eye) JSON'
     );
-
-    // successMatchCallback('');
-
-    // const command = 'npx';
-    // const args = [
-    //   'i18next-conv',
-    //   `-l "${locale}"`,
-    //   `-s "${fsPath}"`,
-    //   `-t "${jsonOutputPath}"`,
-    // ];
-    // try {
-    //   const executionResult =
-    //     await FileChangeHandler.backgroundProcessExecutor.executeInBackground(
-    //       command,
-    //       args,
-    //       successMatchSequence,
-    //       successMatchCallback
-    //     );
-    //   outputChannelManager.appendLine(
-    //     `Command executed with exit code: ${executionResult.exitCode}`,
-    //     LogVerbosity.Important
-    //   );
-    // } catch (error) {
-    //   outputChannelManager.appendLine(
-    //     `Failed to execute command: ${error}`,
-    //     LogVerbosity.Important
-    //   );
-    // }
-
-    // try {
-    //   FileChangeHandler.sortJsonFile(jsonOutputPath);
-    // } catch (error) {
-    //   outputChannelManager.appendLine(
-    //     `Error loading sort-json: ${error}`,
-    //     LogVerbosity.Important
-    //   );
-    // }
   }
 
   public async handleJsonFileChange(
@@ -192,13 +154,6 @@ class FileChangeHandler {
         fileLockManager.removePoFileLock(locale);
       }, 250);
     };
-    // const command = 'npx';
-    // const args = [
-    //   'i18next-conv',
-    //   `-l "${locale}"`,
-    //   `-s "${fsPath}"`,
-    //   `-t "${poOutputPath}"`,
-    // ];
 
     fileLockManager.addPoFilesLock(locale);
 
@@ -207,39 +162,6 @@ class FileChangeHandler {
     await FileUtilities.writePoToFileAsync(poOutputPath, res);
 
     successMatchCallback('');
-
-    // statusBarManager.setStatusBarItemText(StatusBarItemType.PO, '$(eye) PO');
-    // setTimeout(() => {
-    //   // TODO: This callback should only be called when writing to the po file is done.
-    //   // So the json file watcher shouldn't be triggered, but it is...
-    //   // As a workaround we wait for one second after the task is finished.
-    //   fileLockManager.removePoFileLock(locale);
-    // }, 250);
-    // fileLockManager.removePoFileLock(locale);
-
-    //TODO: error handling?
-
-    // try {
-    //   const { stdout, stderr, exitCode } =
-    //     await FileChangeHandler.backgroundProcessExecutor.executeInBackground(
-    //       command,
-    //       args,
-    //       successMatchSequence,
-    //       successMatchCallback,
-    //       cancelCallback
-    //     );
-
-    //   if (exitCode === 0) {
-    //     outputChannelManager.appendLine(stdout);
-    //   } else {
-    //     outputChannelManager.appendLine(stderr, LogVerbosity.Important);
-    //   }
-    // } catch (error) {
-    //   outputChannelManager.appendLine(
-    //     `Failed to execute command: ${error}`,
-    //     LogVerbosity.Important
-    //   );
-    // }
   }
 
   public async handleCodeFileChange(
