@@ -59,7 +59,7 @@ class FileManagement {
     return { jsonOutputPath, poOutputPath, locale };
   }
 
-  public static async getPackageJsonRelativePath(): Promise<
+  public static async getPackageJsonAbsolutePath(): Promise<
     string | undefined
   > {
     const packageJsonRelativePath = configurationManager.getValue<string>(

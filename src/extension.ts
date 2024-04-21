@@ -39,7 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
   initializeStatusBarItems();
   await configurationManager.initializeConfigurationWatcher(context);
 
-  const packageJsonPath = await FileManagement.getPackageJsonRelativePath();
+  const packageJsonPath = await FileManagement.getPackageJsonAbsolutePath();
   if (packageJsonPath) {
     statusBarManager.setStatusBarItemCommand(
       StatusBarItemType.PO,
