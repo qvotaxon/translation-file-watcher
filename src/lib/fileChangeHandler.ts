@@ -12,9 +12,11 @@ import outputChannelManager from './outputChannelManager';
 import BackgroundProcessExecutor from './backgroundProcessExecutor';
 import FileUtilities from './fileUtilities';
 import { po2i18next, i18next2po } from 'gettext-converter';
+import i18nextScannerService from './I18nextScannerService';
 
 class FileChangeHandler {
   private static instance: FileChangeHandler;
+  //TODO: remove current file / old files contents from cache after save to prevent invalid / outdated entries.
   private static previousFileContents: string[] = [];
   private static currentFileContents: string[] = [];
   private static backgroundProcessExecutor: BackgroundProcessExecutor =
@@ -221,11 +223,13 @@ class FileChangeHandler {
           `--config "${FileChangeHandler.i18nScannerConfigAbsolutePath}"`,
         ];
         try {
-          const executionResult =
-            await FileChangeHandler.backgroundProcessExecutor.executeInBackground(
-              command,
-              args
-            );
+          // const executionResult =
+          //   await FileChangeHandler.backgroundProcessExecutor.executeInBackground(
+          //     command,
+          //     args
+          //   );
+
+          i18nextScannerService.scanCode(fsPath!);
 
           statusBarManager.setStatusBarItemText(
             StatusBarItemType.JSON,
@@ -236,9 +240,9 @@ class FileChangeHandler {
             '$(eye) CODE'
           );
 
-          outputChannelManager.appendLine(
-            `Command executed with exit code: ${executionResult.exitCode}`
-          );
+          // outputChannelManager.appendLine(
+          //   `Command executed with exit code: ${executionResult.exitCode}`
+          // );
         } catch (error: any) {
           outputChannelManager.appendLine(
             `Failed to execute command: '${command} ${args}'.\r\nCaught error: ${error}`,

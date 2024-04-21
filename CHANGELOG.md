@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.12.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.11.2...v1.12.0) (2024-04-21)
+
+
+### Features
+
+* Improved file handling ([#82](https://github.com/qvotaxon/translation-file-watcher/issues/82)) ([d08f278](https://github.com/qvotaxon/translation-file-watcher/commit/d08f278e4586e66da7035fd731356d01cdaea8ef))
+
+
+### Bug Fixes
+
+* json file indentation ([#83](https://github.com/qvotaxon/translation-file-watcher/issues/83)) ([2cb2465](https://github.com/qvotaxon/translation-file-watcher/commit/2cb24658d7450c755897fc2cb3c3aaf2b0bdf1a0))
+
 ## [1.11.2](https://github.com/qvotaxon/translation-file-watcher/compare/v1.11.1...v1.11.2) (2024-04-20)
 
 
