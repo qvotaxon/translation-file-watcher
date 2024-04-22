@@ -69,12 +69,12 @@ class FileUtilities {
     });
   }
 
-  public static async writeJsonToFileAsync(
+  public static async writeToFileAsync(
     filePath: string,
-    data: any
+    data: string | NodeJS.ArrayBufferView
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      fs.writeFile(filePath, JSON.stringify(data, null, 4), 'utf8', (err) => {
+      fs.writeFile(filePath, data, 'utf8', (err) => {
         if (err) {
           reject(err);
         } else {
@@ -84,19 +84,19 @@ class FileUtilities {
     });
   }
 
-  public static async writePoToFileAsync(
-    filePath: string,
-    poContents: string
-  ): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      fs.writeFile(filePath, poContents, 'utf8', (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+  public static checkMergeStatus(): boolean {
+    const mergeHeadPath =
+      vscode.workspace.workspaceFolders![0].uri.fsPath + '/../.git/MERGE_HEAD';
+    return (
+      vscode.workspace.workspaceFolders !== undefined &&
+      fs.existsSync(mergeHeadPath)
+    );
+  }
+
+  public static hasMergeMarkers(filePath: string): boolean {
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    // Check if the file content contains any Git merge markers
+    return /<<<<<<<|=======|>>>>>>>/.test(fileContent);
   }
 }
 

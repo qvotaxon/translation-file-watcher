@@ -1,22 +1,25 @@
 import * as vscode from 'vscode';
 import outputChannelManager from './outputChannelManager';
+import { FileChangeHandlerFactory } from './fileChangeHandlerFactory';
 
 class FileWatcherCreator {
   public createSingleFileWatcherForGlobAsync = async (
     pattern: vscode.GlobPattern,
-    onChange: (fsPath: string) => void,
     ...disableFlags: (() => boolean)[]
   ): Promise<vscode.FileSystemWatcher> => {
     return new Promise<vscode.FileSystemWatcher>((resolve, reject) => {
       const fileWatcher = vscode.workspace.createFileSystemWatcher(pattern);
+      const fileChangeHandlerFactory = new FileChangeHandlerFactory();
 
       outputChannelManager.appendLine(
         `Activated File Watcher for: ${pattern.valueOf}.`
       );
 
-      fileWatcher.onDidChange((uri) => {
+      fileWatcher.onDidChange(async (uri) => {
         if (!disableFlags.some((disableFlag) => disableFlag())) {
-          onChange(uri.fsPath);
+          const fileChangeHandler =
+            fileChangeHandlerFactory.createFileChangeHandler(uri.fsPath);
+          await fileChangeHandler?.handleFileChangeAsync(true, uri.fsPath);
         }
       });
 
@@ -26,7 +29,6 @@ class FileWatcherCreator {
 
   public async createFileWatcherForEachFileInGlobAsync(
     pattern: vscode.GlobPattern,
-    onChange: (fsPath: string) => void,
     ...disableFlags: (() => boolean)[]
   ): Promise<vscode.FileSystemWatcher[]> {
     const fileURIs = await vscode.workspace.findFiles(pattern);
@@ -37,7 +39,6 @@ class FileWatcherCreator {
         const filePath = fileURI.fsPath;
         const fileWatcher = await this.createSingleFileWatcherForGlobAsync(
           filePath,
-          onChange,
           ...disableFlags
         );
         fileWatchers.push(fileWatcher);

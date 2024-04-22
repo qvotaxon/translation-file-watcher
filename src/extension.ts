@@ -6,11 +6,14 @@ import {
 } from './lib/userInterface';
 import configurationManager from './lib/configurationManager';
 import statusBarManager from './lib/statusBarManager';
-import fileChangeHandler from './lib/fileChangeHandler';
 import fileLockManager from './lib/fileLockManager';
 import FileManagement from './lib/fileManagement';
 import FileWatcherCreator from './lib/fileWatcherCreator';
 import outputChannelManager from './lib/outputChannelManager';
+import FileContentStore from './lib/fileContentStore';
+import { CodeFileChangeHandler } from './lib/fileChangeHandlers/codeFileChangeHandler';
+import { JsonFileChangeHandler } from './lib/fileChangeHandlers/jsonFileChangeHandler';
+import { PoFileChangeHandler } from './lib/fileChangeHandlers/poFileChangeHandler';
 
 export async function activate(context: vscode.ExtensionContext) {
   const fileWatcherCreator: FileWatcherCreator = new FileWatcherCreator();
@@ -99,11 +102,8 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.poFileWatcherStatusBarItemClicked',
         () => {
-          fileChangeHandler.processJSONFiles(
-            localesAbsolutePath,
-            false,
-            fileChangeHandler.handleJsonFileChange
-          );
+          const jsonFileChangeHandler = new JsonFileChangeHandler();
+          jsonFileChangeHandler.processJSONFiles(localesAbsolutePath, false);
           vscode.window.showInformationMessage('Generating PO files.');
         }
       );
@@ -112,11 +112,8 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'extension.jsonFileWatcherStatusBarItemClicked',
         () => {
-          fileChangeHandler.processPOFiles(
-            localesAbsolutePath,
-            false,
-            fileChangeHandler.handlePOFileChange
-          );
+          const poFileChangeHandler = new PoFileChangeHandler();
+          poFileChangeHandler.processPOFiles(localesAbsolutePath, false);
           vscode.window.showInformationMessage('Generating JSON files.');
         }
       );
@@ -124,9 +121,15 @@ export async function activate(context: vscode.ExtensionContext) {
     let codeFileWatcherStatusBarItemClickedCommand =
       vscode.commands.registerCommand(
         'extension.codeFileWatcherStatusBarItemClicked',
-        () => {
-          fileChangeHandler.handleCodeFileChange(undefined, false);
+        async () => {
           vscode.window.showInformationMessage('Generating JSON files.');
+
+          const codeFileChangeHandler = new CodeFileChangeHandler();
+          await codeFileChangeHandler.handleFileChangeAsync(
+            false,
+            undefined,
+            true
+          );
         }
       );
 
@@ -142,27 +145,24 @@ export async function activate(context: vscode.ExtensionContext) {
   const jsonFileGlobPattern = `${localesRelativePath}/**/*.json`;
 
   //TODO: use relativeLocalesPath to read po files from. Same for tsx ts files.
-  await fileChangeHandler.initializeInitialFileContentsAsync(
+  await FileContentStore.getInstance().initializeInitialFileContentsAsync(
     codeFileGlobPattern
   );
 
   const poFileWatchers =
     await fileWatcherCreator.createFileWatcherForEachFileInGlobAsync(
       poFileGlobPattern,
-      fileChangeHandler.handlePOFileChange,
       fileLockManager.isMasterLockEnabled,
       fileLockManager.arePoFilesLocked
     );
   const jsonFileWatchers =
     await fileWatcherCreator.createFileWatcherForEachFileInGlobAsync(
       jsonFileGlobPattern,
-      fileChangeHandler.handleJsonFileChange,
       fileLockManager.isMasterLockEnabled
     );
   const codeFileWatcher =
     await fileWatcherCreator.createSingleFileWatcherForGlobAsync(
       codeFileGlobPattern,
-      fileChangeHandler.handleCodeFileChange,
       fileLockManager.isMasterLockEnabled
     );
 
