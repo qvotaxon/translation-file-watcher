@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/qvotaxon/translation-file-watcher/compare/v1.13.0...v1.13.1) (2024-04-22)
+
+
+### Bug Fixes
+
+* code file handler ([#88](https://github.com/qvotaxon/translation-file-watcher/issues/88)) ([714bfb5](https://github.com/qvotaxon/translation-file-watcher/commit/714bfb5cada05d22298029643e474cf7c9f04b97))
+
 ## [1.13.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.12.0...v1.13.0) (2024-04-21)
 
 
