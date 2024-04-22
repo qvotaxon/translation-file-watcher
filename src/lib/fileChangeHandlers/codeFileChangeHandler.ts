@@ -13,8 +13,14 @@ export class CodeFileChangeHandler implements FileChangeHandler {
     changeFileLocation?: string,
     forceExecution?: boolean
   ): Promise<void> {
+    if (!forceExecution && changeFileLocation) {
+      FileContentStore.updateCurrentFileContents(changeFileLocation);
+    }
+
     const { prerequisitesFulfilled, reason } = this.prerequisitesFulfilled(
-      triggeredByFileWatcher
+      triggeredByFileWatcher,
+      changeFileLocation,
+      forceExecution
     );
 
     if (!prerequisitesFulfilled) {
@@ -28,14 +34,6 @@ export class CodeFileChangeHandler implements FileChangeHandler {
       );
     } else if (forceExecution) {
       outputChannelManager.appendLine(`Manual code change trigger received.`);
-    }
-
-    if (
-      !forceExecution &&
-      changeFileLocation &&
-      FileContentStore.fileChangeContainsTranslationKeys(changeFileLocation)
-    ) {
-      FileContentStore.updateCurrentFileContents(changeFileLocation);
     }
 
     statusBarManager.setStatusBarItemText(
@@ -92,9 +90,22 @@ export class CodeFileChangeHandler implements FileChangeHandler {
     }
   }
 
-  private prerequisitesFulfilled(triggeredByFileWatcher: boolean) {
+  private prerequisitesFulfilled(
+    triggeredByFileWatcher: boolean,
+    changeFileLocation?: string,
+    forceExecution?: boolean
+  ) {
     let reason = '';
     let prerequisitesFulfilled = true;
+
+    if (
+      !forceExecution &&
+      changeFileLocation &&
+      !FileContentStore.fileChangeContainsTranslationKeys(changeFileLocation)
+    ) {
+      reason = "Code change doesn't contain translation keys. Skipping.";
+      prerequisitesFulfilled = false;
+    }
 
     if (
       FileManagement.isFileModeManual(FileType.Code) &&
