@@ -30,12 +30,6 @@ class FileManagement {
     }
   }
 
-  public static hasMergeMarkers(filePath: string): boolean {
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    // Check if the file content contains any Git merge markers
-    return /<<<<<<<|=======|>>>>>>>/.test(fileContent);
-  }
-
   public static extractParts(filePath: string): {
     jsonOutputPath: string;
     poOutputPath: string;
