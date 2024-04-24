@@ -55,8 +55,8 @@ jobs:
         run: npm run lint
 
       #Disabled for now because it will fail on ubuntu.
-      #- name: Test
-      #  run: npm run test
+      - name: Test
+        run: npm run test
 
   create:
     name: Create extension
