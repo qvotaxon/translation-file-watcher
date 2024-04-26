@@ -38,12 +38,12 @@ export class JsonFileChangeHandler implements FileChangeHandler {
       generatePo
     );
 
+    outputChannelManager.appendLine(`Json File Changed: ${changeFileLocation}`);
+
     if (!prerequisitesFulfilled) {
       outputChannelManager.appendLine(reason);
       return;
     }
-
-    outputChannelManager.appendLine(`Json File Changed: ${changeFileLocation}`);
 
     const { poOutputPath, locale } =
       FileManagement.extractParts(changeFileLocation);
@@ -59,15 +59,17 @@ export class JsonFileChangeHandler implements FileChangeHandler {
         // TODO: This callback should only be called when writing to the po file is done.
         // So the json file watcher shouldn't be triggered, but it is...
         // As a workaround we wait for one second after the task is finished.
-        fileLockManager.removePoFileLock(locale);
+        fileLockManager.removeFileLock(changeFileLocation);
       }, 250);
     };
 
-    fileLockManager.addPoFilesLock(locale);
+    fileLockManager.addFileLock(changeFileLocation);
 
     const json = await FileUtilities.readFileContentsAsync(changeFileLocation);
     const res = i18next2po(locale, json, { compatibilityJSON: 'v3' });
     await FileUtilities.writeToFileAsync(poOutputPath, res);
+
+    outputChannelManager.appendLine('Writing to po file ' + poOutputPath);
 
     successMatchCallback('');
   }

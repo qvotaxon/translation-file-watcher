@@ -25,21 +25,21 @@ export class PoFileChangeHandler implements FileChangeHandler {
       return;
     }
 
-    const { jsonOutputPath, locale } =
-      FileManagement.extractParts(changeFileLocation);
+    const { jsonOutputPath } = FileManagement.extractParts(changeFileLocation);
 
     const { prerequisitesFulfilled, reason } = this.prerequisitesFulfilled(
-      locale,
+      changeFileLocation,
       jsonOutputPath,
       triggeredByFileWatcher
     );
+
+    outputChannelManager.appendLine(`Po File Changed: ${changeFileLocation}`);
 
     if (!prerequisitesFulfilled) {
       outputChannelManager.appendLine(reason);
       return;
     }
 
-    outputChannelManager.appendLine(`Po File Changed: ${changeFileLocation}`);
     statusBarManager.setStatusBarItemText(
       StatusBarItemType.JSON,
       '$(sync~spin) JSON'
@@ -52,6 +52,7 @@ export class PoFileChangeHandler implements FileChangeHandler {
         jsonOutputPath,
         JSON.stringify(res, null, 4)
       );
+      outputChannelManager.appendLine(`Wrote to json file ${jsonOutputPath}`);
     } catch (error) {
       outputChannelManager.appendLine(
         `An error occured whilst trying to convert Po to Json. ${error}`,
@@ -66,15 +67,15 @@ export class PoFileChangeHandler implements FileChangeHandler {
   }
 
   private prerequisitesFulfilled(
-    locale: string,
+    changeFileLocation: string,
     jsonOutputPath: string,
     triggeredByFileWatcher: boolean
   ) {
     let reason = '';
     let prerequisitesFulfilled = true;
 
-    if (fileLockManager.isPoFileLocked(locale)) {
-      reason = `Po file ${locale} locked. Skipping.`;
+    if (fileLockManager.isFileLocked(jsonOutputPath)) {
+      reason = `Json file ${jsonOutputPath} locked. Skipping.`;
       prerequisitesFulfilled = false;
     }
 

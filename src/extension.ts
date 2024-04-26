@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { StatusBarItemType } from './lib/Enums';
+import { LogVerbosity, StatusBarItemType } from './lib/Enums';
 import {
   notifyRequiredSettings,
   initializeStatusBarItems,
@@ -19,7 +19,8 @@ export async function activate(context: vscode.ExtensionContext) {
   const fileWatcherCreator: FileWatcherCreator = new FileWatcherCreator();
 
   outputChannelManager.appendLine(
-    'Activated Translation File Watcher Extension'
+    'Activated Translation File Watcher Extension',
+    LogVerbosity.Important
   );
 
   const myExtension = vscode.extensions.getExtension(
@@ -40,6 +41,11 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   initializeStatusBarItems();
+  const enableVerboseLogging = configurationManager.getValue<boolean>(
+    'logging.enableVerboseLogging',
+    false
+  )!;
+  outputChannelManager.setVerboseLogging(enableVerboseLogging);
   await configurationManager.initializeConfigurationWatcher(context);
 
   const packageJsonPath = await FileManagement.getPackageJsonAbsolutePath();
@@ -152,8 +158,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const poFileWatchers =
     await fileWatcherCreator.createFileWatcherForEachFileInGlobAsync(
       poFileGlobPattern,
-      fileLockManager.isMasterLockEnabled,
-      fileLockManager.arePoFilesLocked
+      fileLockManager.isMasterLockEnabled
     );
   const jsonFileWatchers =
     await fileWatcherCreator.createFileWatcherForEachFileInGlobAsync(

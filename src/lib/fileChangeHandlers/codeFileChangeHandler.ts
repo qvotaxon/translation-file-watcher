@@ -17,6 +17,14 @@ export class CodeFileChangeHandler implements FileChangeHandler {
       FileContentStore.updateCurrentFileContents(changeFileLocation);
     }
 
+    if (changeFileLocation) {
+      outputChannelManager.appendLine(
+        `Code File (**​/*.{ts,tsx}) Changed: ${changeFileLocation}`
+      );
+    } else if (forceExecution) {
+      outputChannelManager.appendLine(`Manual code change trigger received.`);
+    }
+
     const { prerequisitesFulfilled, reason } = this.prerequisitesFulfilled(
       triggeredByFileWatcher,
       changeFileLocation,
@@ -26,14 +34,6 @@ export class CodeFileChangeHandler implements FileChangeHandler {
     if (!prerequisitesFulfilled) {
       outputChannelManager.appendLine(reason);
       return;
-    }
-
-    if (changeFileLocation) {
-      outputChannelManager.appendLine(
-        `Code File (**​/*.{ts,tsx}) Changed: ${changeFileLocation}`
-      );
-    } else if (forceExecution) {
-      outputChannelManager.appendLine(`Manual code change trigger received.`);
     }
 
     statusBarManager.setStatusBarItemText(

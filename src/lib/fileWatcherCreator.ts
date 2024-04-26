@@ -12,7 +12,7 @@ class FileWatcherCreator {
       const fileChangeHandlerFactory = new FileChangeHandlerFactory();
 
       outputChannelManager.appendLine(
-        `Activated File Watcher for: ${pattern.valueOf}.`
+        `Activated File Watcher for: ${pattern.valueOf()}.`
       );
 
       fileWatcher.onDidChange(async (uri) => {
@@ -28,7 +28,7 @@ class FileWatcherCreator {
   };
 
   public async createFileWatcherForEachFileInGlobAsync(
-    pattern: vscode.GlobPattern,
+    pattern: string,
     ...disableFlags: (() => boolean)[]
   ): Promise<vscode.FileSystemWatcher[]> {
     const fileURIs = await vscode.workspace.findFiles(pattern);
