@@ -6,6 +6,7 @@ export default class FileContentStore {
   //TODO: remove current file / old files contents from cache after save to prevent invalid / outdated entries.
   private static previousFileContents: string[] = [];
   private static currentFileContents: string[] = [];
+  private static i18nScannerConfigAbsolutePath: string;
 
   public getCurrentFileContents = () => FileContentStore.currentFileContents;
   public getPreviousFileContents = () => FileContentStore.previousFileContents;
@@ -84,7 +85,7 @@ export default class FileContentStore {
     const currentLines = currentData.split('\n');
     const previousLines = previousData?.split('\n') ?? [];
 
-    const changedLines: string[] = [];
+    const changedLines = [];
 
     const currentLineSet = new Set(currentLines.map((line) => line.trim()));
     const previousLineSet = new Set(previousLines.map((line) => line.trim()));
@@ -110,7 +111,7 @@ export default class FileContentStore {
 
   private static extractTranslationKeys = (lines: string[]) => {
     const translationKeys: string[] = [];
-    const keyRegex = /(?:I18nKey|t)\(\s*['"`](.*?)['"`]\s*\)?/g;
+    const keyRegex = /(?:I18nKey|t)\(\s*['"`](.*?)['"`]\s*\)/g;
 
     lines.forEach((line: string) => {
       let match;

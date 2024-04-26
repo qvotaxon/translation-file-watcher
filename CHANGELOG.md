@@ -1,12 +1,5 @@
 # Changelog
 
-## [1.13.2](https://github.com/qvotaxon/translation-file-watcher/compare/v1.13.1...v1.13.2) (2024-04-23)
-
-
-### Bug Fixes
-
-* **file-watchers:** fix changed lines detection ([#90](https://github.com/qvotaxon/translation-file-watcher/issues/90)) ([3a4a65b](https://github.com/qvotaxon/translation-file-watcher/commit/3a4a65b465defb3632aed1ff6f6408dc72bb5a61))
-
 ## [1.13.1](https://github.com/qvotaxon/translation-file-watcher/compare/v1.13.0...v1.13.1) (2024-04-22)
 
 
