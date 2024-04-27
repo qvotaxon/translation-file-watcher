@@ -1,6 +1,6 @@
 @startuml
 
-!theme cerulean-outline
+!theme cerulean
 
 skinparam defaultFontName Calibri
 skinparam defaultFontSize 20

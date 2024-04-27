@@ -1,16 +1,6 @@
 @startuml Extension Initialization Sequence
 
-' !include style/sequence.style.iuml
-' !theme cerulean-outline
-
-skinparam defaultFontName Calibri
-skinparam defaultFontSize 20
-skinparam sequenceLifeLineBorderColor #333
-skinparam legendBackgroundColor #FFFFFF
-skinparam legendBorderColor #FFFFFF
-skinparam legendEntrySeparator #FFFFFF
-skinparam arrowThickness 2.5
-
+!include style/sequence.style.iuml
 !include style/sequence.settings.iuml
 !include style/sequence.variables.iuml
 
