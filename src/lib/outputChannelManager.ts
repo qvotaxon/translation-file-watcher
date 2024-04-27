@@ -39,9 +39,10 @@ class OutputChannelManager {
     message: string,
     verbosity: LogVerbosity = LogVerbosity.Verbose
   ) {
-    if (verbosity === LogVerbosity.Verbose && this._verboseLogging) {
-      this._outputChannel.appendLine(message);
-    } else if (verbosity === LogVerbosity.Important) {
+    if (
+      (verbosity === LogVerbosity.Verbose && this._verboseLogging) ||
+      verbosity === LogVerbosity.Important
+    ) {
       this._outputChannel.appendLine(message);
     }
   }
