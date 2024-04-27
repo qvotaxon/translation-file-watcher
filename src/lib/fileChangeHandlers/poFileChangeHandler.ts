@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { FileChangeHandler } from '../interfaces/fileChangeHandler';
-import { FileType, LogVerbosity, StatusBarItemType } from '../Enums';
+import { LogVerbosity } from '../enums/logVerbosity';
+import { StatusBarItemType } from '../enums/statusBarItemType';
+import { FileType } from '../enums/fileType';
 import fileLockManager from '../fileLockManager';
 import FileManagement from '../fileManagement';
 import FileUtilities from '../fileUtilities';

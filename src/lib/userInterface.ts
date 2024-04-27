@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { StatusBarItemType } from './Enums';
+import { StatusBarItemType } from './enums/statusBarItemType';
 import statusBarManager from './statusBarManager';
 
 export function notifyRequiredSettings() {

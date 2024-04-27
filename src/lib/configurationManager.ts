@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import outputChannelManager from './outputChannelManager';
 import statusBarManager from './statusBarManager';
-import { StatusBarItemType } from './Enums';
+import { StatusBarItemType } from './enums/statusBarItemType';
 
 class ConfigurationManager {
   private static instance: ConfigurationManager;

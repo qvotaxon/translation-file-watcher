@@ -1,4 +1,6 @@
-import { FileType, LogVerbosity, StatusBarItemType } from '../Enums';
+import { FileType } from '../enums/fileType';
+import { LogVerbosity } from '../enums/logVerbosity';
+import { StatusBarItemType } from '../enums/statusBarItemType';
 import i18nextScannerService from '../I18nextScannerService';
 import FileContentStore from '../fileContentStore';
 import FileManagement from '../fileManagement';

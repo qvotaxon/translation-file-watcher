@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import fs from 'fs';
-import { FileMode, FileType } from './Enums';
+import { FileMode } from './enums/fileMode';
+import { FileType } from './enums/fileType';
 import configurationManager from './configurationManager';
 
 class FileManagement {

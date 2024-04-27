@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { LogVerbosity, StatusBarItemType } from './lib/Enums';
+import { LogVerbosity } from './lib/enums/logVerbosity';
+import { StatusBarItemType } from './lib/enums/statusBarItemType';
 import {
   notifyRequiredSettings,
   initializeStatusBarItems,
