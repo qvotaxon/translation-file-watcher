@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.14.0...v1.15.0) (2024-04-27)
+
+
+### Features
+
+* move sequence diagram to diagrams folder ([1ba755e](https://github.com/qvotaxon/translation-file-watcher/commit/1ba755eee862eff3dcb8a8f76bd5ab9c4303cb64))
+
 ## [1.14.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.13.2...v1.14.0) (2024-04-27)
 
 
