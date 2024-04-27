@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.13.2...v1.14.0) (2024-04-27)
+
+
+### Features
+
+* Improve PO file processing ([d3cdb22](https://github.com/qvotaxon/translation-file-watcher/commit/d3cdb2252f0ee1eeec44741a9ec66b1dbb243b11))
+* **poFileChangeHandler:** add newline to JSON output ([fd51ce6](https://github.com/qvotaxon/translation-file-watcher/commit/fd51ce6e6d980c44574ae03f601903ebb50641af))
+
 ## [1.13.2](https://github.com/qvotaxon/translation-file-watcher/compare/v1.13.1...v1.13.2) (2024-04-23)
 
 
