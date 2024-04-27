@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { FileType, StatusBarItemType } from '../Enums';
-import { CallbackOnMatch } from '../Types';
+import { StatusBarItemType } from '../enums/statusBarItemType';
+import { FileType } from '../enums/fileType';
 import configurationManager from '../configurationManager';
 import fileLockManager from '../fileLockManager';
 import FileManagement from '../fileManagement';
@@ -11,6 +11,7 @@ import { i18next2po } from 'gettext-converter';
 import outputChannelManager from '../outputChannelManager';
 import statusBarManager from '../statusBarManager';
 import { FileChangeHandlerFactory } from '../fileChangeHandlerFactory';
+import { CallbackOnMatch } from '../types/callbackOnMatch';
 
 export class JsonFileChangeHandler implements FileChangeHandler {
   private fileChangeHandlerFactory: FileChangeHandlerFactory;

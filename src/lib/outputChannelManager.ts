@@ -1,5 +1,5 @@
 import { OutputChannel, window } from 'vscode';
-import { LogVerbosity } from './Enums';
+import { LogVerbosity } from './enums/logVerbosity';
 
 class OutputChannelManager {
   private _verboseLogging = false;
