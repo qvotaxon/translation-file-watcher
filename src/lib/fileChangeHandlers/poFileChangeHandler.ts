@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import stringify from 'json-stable-stringify';
 import { FileChangeHandler } from '../interfaces/fileChangeHandler';
 import { LogVerbosity } from '../enums/logVerbosity';
 import { StatusBarItemType } from '../enums/statusBarItemType';
@@ -30,7 +31,6 @@ export class PoFileChangeHandler implements FileChangeHandler {
     const { jsonOutputPath } = FileManagement.extractParts(changeFileLocation);
 
     const { prerequisitesFulfilled, reason } = this.prerequisitesFulfilled(
-      changeFileLocation,
       jsonOutputPath,
       triggeredByFileWatcher
     );
@@ -52,7 +52,10 @@ export class PoFileChangeHandler implements FileChangeHandler {
       const res = po2i18next(po, { compatibilityJSON: 'v3' });
       await FileUtilities.writeToFileAsync(
         jsonOutputPath,
-        JSON.stringify(res, null, 4)
+        stringify(res, {
+          space: 4,
+          cycles: false,
+        })
       );
       outputChannelManager.appendLine(`Wrote to json file ${jsonOutputPath}`);
     } catch (error) {
@@ -69,7 +72,6 @@ export class PoFileChangeHandler implements FileChangeHandler {
   }
 
   private prerequisitesFulfilled(
-    changeFileLocation: string,
     jsonOutputPath: string,
     triggeredByFileWatcher: boolean
   ) {
@@ -85,7 +87,7 @@ export class PoFileChangeHandler implements FileChangeHandler {
       FileManagement.isFileModeManual(FileType.Po) &&
       triggeredByFileWatcher
     ) {
-      reason = 'Manual mode enabled for Po files. Skipping.';
+      reason = 'Manual mode enabled for Po files.';
       prerequisitesFulfilled = false;
     }
 
@@ -93,14 +95,13 @@ export class PoFileChangeHandler implements FileChangeHandler {
       FileUtilities.hasMergeMarkers(jsonOutputPath) ||
       FileUtilities.checkMergeStatus()
     ) {
-      reason = 'File contains Git merge markers. Sorting aborted.';
+      reason = 'File contains Git merge markers.';
       prerequisitesFulfilled = false;
     }
 
     return { prerequisitesFulfilled, reason };
   }
 
-  //TODO: move to own class.
   public processPOFiles = (
     directory: string,
     triggeredByFileWatcher: boolean
