@@ -31,7 +31,7 @@ box "External Logic" $externalServicesBoxColor
 end box
 
 === ACTIVATION ===
-->>X: <:zap:> activate()
+->>X:<<event>>activate()
 X->OPCMNG:initializeOutputChannel(channelName: string)
 OPCMNG->VSCAPI:window.createOutputChannel(channelName: string)
 return
@@ -47,7 +47,7 @@ FCS->VSCAPI:workspace.findFiles
 return
 return
 === DEACTIVATION ===
-->>X: <:zap:> dectivate()
+->>X:<<event>>dectivate()
 
 
 @enduml
