@@ -4,8 +4,8 @@ on:
     paths:
       - 'docs/**/**.puml'
 
-# permissions:
-#   contents: write
+permissions:
+  contents: write
 jobs:
   plantuml:
     runs-on: ubuntu-latest
