@@ -1,0 +1,52 @@
+@startuml Extension Initialization Sequence
+
+!include style/sequence.style.iuml
+!include style/sequence.settings.iuml
+
+legend top left
+  <#GhostWhite,#GhostWhite>|        |= __ESB Message Types__ |
+  |<$syncColor>   | Sync|
+  |<$asyncColor>  | Async|
+endlegend
+
+title Extension Initialization Sequence
+
+!define X "Extension"
+!define OPCMNG "OutputChannelManager"
+!define CNFMNG "ConfigurationManager"
+!define FCS "FileContentStore"
+
+!define VSCAPI "VS Code API"
+
+box "Internal Logic" $internalServicesBoxColor
+    participant X
+    participant OPCMNG   << (S,#ADD1B2) Singleton >>
+    participant CNFMNG   << (S,#ADD1B2) Singleton >>
+    participant FCS      << (S,#ADD1B2) Singleton >>
+end box
+
+box "External Logic" $externalServicesBoxColor
+    participant VSCAPI
+end box
+
+=== ACTIVATION ===
+->>X: <:zap:> activate()
+X->OPCMNG:initializeOutputChannel(channelName: string)
+OPCMNG->VSCAPI:window.createOutputChannel(channelName: string)
+return
+return
+X->CNFMNG:initializeExtensionConfiguration(rootConfigurationKey: string)
+CNFMNG->CNFMNG:mapConfiguration()
+return
+CNFMNG->CNFMNG:initializeConfigurationWatchers()
+return
+return
+X->FCS:initializeFileContentStore()
+FCS->VSCAPI:workspace.findFiles
+return
+return
+=== DEACTIVATION ===
+->>X: <:zap:> dectivate()
+
+
+@enduml

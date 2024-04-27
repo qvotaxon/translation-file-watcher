@@ -1,0 +1,7 @@
+@startuml
+!$syncColor = "#green"
+!$asyncColor = "#orange"
+
+!$internalServicesBoxColor = "#Gainsboro"
+!$externalServicesBoxColor = "#Lavender"
+@enduml 

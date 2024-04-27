@@ -1,0 +1,13 @@
+@startuml
+!include sequence.variables.iuml
+
+!theme cerulean-outline
+
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 20
+skinparam sequenceLifeLineBorderColor #333
+skinparam legendBackgroundColor #FFFFFF
+skinparam legendBorderColor #FFFFFF
+skinparam legendEntrySeparator #FFFFFF
+skinparam arrowThickness 2.5
+@enduml
