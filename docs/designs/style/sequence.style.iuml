@@ -1,5 +1,4 @@
 @startuml
-!include sequence.variables.iuml
 
 !theme cerulean-outline
 
