@@ -4,7 +4,6 @@
 !include style/sequence.settings.iuml
 !include style/sequence.variables.iuml
 
-
 legend top left
   <#GhostWhite,#GhostWhite>|        |= __ESB Message Types__ |
   |<$syncColor>   | Sync|
