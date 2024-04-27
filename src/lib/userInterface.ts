@@ -61,6 +61,10 @@ export class UserInterfaceManager {
     codeStatusBarItem.text = '$(eye) CODE';
     codeStatusBarItem.tooltip =
       'Watching code files (click to generate JSON files)';
+
+    statusBarManager.showStatusBarItem(StatusBarItemType.PO);
+    statusBarManager.showStatusBarItem(StatusBarItemType.JSON);
+    statusBarManager.showStatusBarItem(StatusBarItemType.CODE);
   }
 
   public static async setupStatusBarItemsAsync() {
@@ -148,6 +152,19 @@ export class UserInterfaceManager {
         poFileWatcherStatusBarItemClickedCommand,
         jsonFileWatcherStatusBarItemClickedCommand,
         codeFileWatcherStatusBarItemClickedCommand
+      );
+
+      statusBarManager.setStatusBarItemCommand(
+        StatusBarItemType.PO,
+        'extension.poFileWatcherStatusBarItemClicked'
+      );
+      statusBarManager.setStatusBarItemCommand(
+        StatusBarItemType.JSON,
+        'extension.jsonFileWatcherStatusBarItemClicked'
+      );
+      statusBarManager.setStatusBarItemCommand(
+        StatusBarItemType.CODE,
+        'extension.codeFileWatcherStatusBarItemClicked'
       );
     }
   }
