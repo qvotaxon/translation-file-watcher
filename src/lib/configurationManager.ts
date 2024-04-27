@@ -47,7 +47,7 @@ export class ConfigurationManager {
     );
 
     if (currentVersion !== lastVersion) {
-      void context.globalState.update(
+      context.globalState.update(
         'TranslationFileWatcherExtensionVersion',
         currentVersion
       );
