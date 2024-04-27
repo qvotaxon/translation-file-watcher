@@ -50,13 +50,14 @@ export class PoFileChangeHandler implements FileChangeHandler {
     try {
       const po = await FileUtilities.readFileContentsAsync(changeFileLocation);
       const res = po2i18next(po, { compatibilityJSON: 'v3' });
-      await FileUtilities.writeToFileAsync(
-        jsonOutputPath,
-        stringify(res, {
-          space: 4,
-          cycles: false,
-        })
-      );
+
+      let jsonResult = stringify(res, {
+        space: 4,
+        cycles: false,
+      });
+      jsonResult = jsonResult + '\n';
+
+      await FileUtilities.writeToFileAsync(jsonOutputPath, jsonResult);
       outputChannelManager.appendLine(`Wrote to json file ${jsonOutputPath}`);
     } catch (error) {
       outputChannelManager.appendLine(
