@@ -1,7 +1,7 @@
 @startuml Extension Initialization Sequence
 
 ' !include style/sequence.style.iuml
-!theme cerulean-outline
+' !theme cerulean-outline
 
 skinparam defaultFontName Calibri
 skinparam defaultFontSize 20
