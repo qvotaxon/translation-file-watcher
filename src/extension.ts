@@ -1,357 +1,197 @@
 import * as vscode from 'vscode';
-import { createFileWatcher } from './lib/file-watcher';
+import { LogVerbosity } from './lib/enums/logVerbosity';
+import { StatusBarItemType } from './lib/enums/statusBarItemType';
 import {
-  arePoFilesLocked,
-  addPoFilesLock,
-  setMasterLock,
-  isMasterLockEnabled,
-  removePoFileLock,
-} from './lib/file-lock-manager';
-import { spawn } from 'child_process';
-import path from 'path';
-import fs from 'fs';
-
-let projectRootPath: string | undefined = undefined;
-let poFileWatcherStatusBarItem: vscode.StatusBarItem;
-let jsonFileWatcherStatusBarItem: vscode.StatusBarItem;
-let codeFileWatcherStatusBarItem: vscode.StatusBarItem;
-type CallbackOnMatch = (output: string) => void;
-
-function getLastThreeDirectories(
-  directoryPath: string,
-  maxLength = 200
-): string {
-  const pathComponents = directoryPath.split(/[\\/]/).filter(Boolean);
-  const lastThreePaths = pathComponents.slice(-3).join('/');
-
-  if (lastThreePaths.length > maxLength) {
-    return directoryPath;
-  } else {
-    return lastThreePaths;
-  }
-}
-
-function getConfig(): vscode.WorkspaceConfiguration {
-  return vscode.workspace.getConfiguration('translationFileWatcher');
-}
-
-function extractParts(filePath: string): {
-  jsonOutputPath: string;
-  poOutputPath: string;
-  locale: string;
-} {
-  const localePattern = /\\locales\\([^\\]+)\\/;
-  const match = localePattern.exec(filePath);
-
-  if (!match || match.length < 2) {
-    throw new Error('Invalid file path format');
-  }
-
-  const locale = match[1];
-  const isPOFile = filePath.endsWith('.po');
-  const extension = isPOFile ? 'json' : 'po';
-
-  const commonPath = filePath.replace(/\.po$|\.json$/, '');
-  const jsonOutputPath = isPOFile ? `${commonPath}.${extension}` : filePath;
-  const poOutputPath = !isPOFile ? `${commonPath}.${extension}` : filePath;
-
-  return { jsonOutputPath, poOutputPath, locale };
-}
-
-async function findPackageJson(): Promise<string | undefined> {
-  const packageJsonAbsolutePath = getConfig().get<string>(
-    'packageJsonAbsolutePath'
-  );
-
-  if (packageJsonAbsolutePath) {
-    if (!fs.existsSync(packageJsonAbsolutePath)) {
-      vscode.window.showErrorMessage(
-        `The configured absolute json path (${packageJsonAbsolutePath}) does not exist. Please check your configuration.`
-      );
-      deactivate();
-      return;
-    }
-
-    return packageJsonAbsolutePath;
-  }
-
-  const files = await vscode.workspace.findFiles('**/package.json');
-  if (files.length > 0) {
-    return files[0].fsPath;
-  }
-  return undefined;
-}
-
-/**
- * @param {string} command
- * @param {string[]} args
- * @param {string} successMatchSequence A string to watch for on stdout on the background job. When found, `callbackOnMatch` will be called.
- * @param {CallbackOnMatch} [callbackOnMatch] The method to called when `successMatchSequence` is found.
- * @return {*}  {Promise<{ stdout: string; stderr: string; exitCode: number }>}
- */
-function executeInBackground(
-  command: string,
-  args: string[],
-  successMatchSequence?: string,
-  callbackOnMatch?: CallbackOnMatch
-): Promise<{ stdout: string; stderr: string; exitCode: number }> {
-  return new Promise((resolve, reject) => {
-    const childProcess = spawn(command, args, {
-      shell: 'cmd',
-      cwd: projectRootPath,
-      // cwd: `${vscode.workspace.workspaceFolders![0].uri.fsPath}`,
-    });
-    let stdout = '';
-    let stderr = '';
-
-    childProcess.stdout.on('data', (data) => {
-      const output = data.toString();
-      stdout += output;
-
-      console.log(output);
-      if (
-        successMatchSequence &&
-        callbackOnMatch &&
-        output.includes(successMatchSequence)
-      ) {
-        callbackOnMatch(output);
-      }
-    });
-
-    childProcess.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
-
-    childProcess.on('error', (error) => {
-      console.error('Failed to execute command:', error);
-      reject(error);
-    });
-
-    childProcess.on('exit', (exitCode) => {
-      if (exitCode !== null) {
-        console.log('Command exited with code:', exitCode);
-        resolve({ stdout, stderr, exitCode });
-      } else {
-        const errorMessage = 'Command exited with unknown code';
-        console.error(errorMessage);
-        reject(new Error(errorMessage));
-      }
-    });
-  });
-}
-
-async function handlePOFileChange(uri: vscode.Uri): Promise<void> {
-  console.log(`Po File Changed: ${uri.fsPath}`);
-  poFileWatcherStatusBarItem.text = '$(loading~spin) PO';
-
-  const successMatchSequence = 'file written';
-  const successMatchCallback: CallbackOnMatch = () => {
-    console.log(`Match found while loocking for ${successMatchSequence}`);
-    setTimeout(() => {
-      // TODO: This callback should only be called when writing to the file is done.
-      // So the file watcher shouldn't be triggered, but it is...
-      // As a workaround we wait for one second after the task is finished.
-      // See handleJsonFileChange todo for a better example.
-      poFileWatcherStatusBarItem.text = '$(check) PO';
-
-      setTimeout(() => {
-        poFileWatcherStatusBarItem.text = '$(eye) PO';
-      }, 2000);
-    }, 1000);
-  };
-  const { jsonOutputPath, locale } = extractParts(uri.fsPath);
-  const command = 'npx';
-  const args = [
-    'i18next-conv',
-    `-l "${locale}"`,
-    `-s "${uri.fsPath}"`,
-    `-t "${jsonOutputPath}"`,
-  ];
-  try {
-    const exitCode = await executeInBackground(
-      command,
-      args,
-      successMatchSequence,
-      successMatchCallback
-    );
-    console.log('Command executed with exit code:', exitCode);
-  } catch (error) {
-    console.error('Failed to execute command:', error);
-  }
-}
-
-async function handleJsonFileChange(uri: vscode.Uri): Promise<void> {
-  console.log(`Json File Changed: ${uri.fsPath}`);
-  jsonFileWatcherStatusBarItem.text = '$(loading~spin) JSON';
-
-  const successMatchSequence = 'file written';
-  const successMatchCallback: CallbackOnMatch = () => {
-    console.log(`Match found while loocking for ${successMatchSequence}`);
-    setTimeout(() => {
-      // TODO: This callback should only be called when writing to the po file is done.
-      // So the json file watcher shouldn't be triggered, but it is...
-      // As a workaround we wait for one second after the task is finished.
-      removePoFileLock();
-      jsonFileWatcherStatusBarItem.text = '$(check) JSON';
-      setTimeout(() => {
-        jsonFileWatcherStatusBarItem.text = '$(eye) JSON';
-      }, 2000);
-    }, 1000);
-  };
-  const { poOutputPath, locale } = extractParts(uri.fsPath);
-  const command = 'npx';
-  const args = [
-    'i18next-conv',
-    `-l "${locale}"`,
-    `-s "${uri.fsPath}"`,
-    `-t "${poOutputPath}"`,
-  ];
-
-  //TODO: error handling?
-  addPoFilesLock();
-
-  try {
-    const { stdout, stderr, exitCode } = await executeInBackground(
-      command,
-      args,
-      successMatchSequence,
-      successMatchCallback
-    );
-
-    if (exitCode === 0) {
-      console.log(stdout);
-    } else {
-      console.error(stderr);
-    }
-  } catch (error) {
-    console.error('Failed to execute command:', error);
-  }
-}
-
-async function handleCodeFileChange(uri: vscode.Uri): Promise<void> {
-  console.log(`Code File (**​/*.{ts,tsx}) Changed: ${uri.fsPath}`);
-  codeFileWatcherStatusBarItem.text = '$(loading~spin) CODE';
-
-  const i18nScannerConfigRelativePath = getConfig().get<string>(
-    'i18nScannerConfigRelativePath',
-    'i18next-scanner.config.js'
-  );
-  const command = 'npx';
-  const args = [
-    'i18next-scanner',
-    // `"${uri.fsPath}"`, //TODO: nogmaals kijken of per file idd net zo snel is als hele project. Wel eerst removeUnusedKeys uitzetten.
-    `--config ${i18nScannerConfigRelativePath}`,
-  ];
-  try {
-    const exitCode = await executeInBackground(command, args);
-
-    codeFileWatcherStatusBarItem.text = '$(check) CODE';
-    setTimeout(() => {
-      codeFileWatcherStatusBarItem.text = '$(eye) CODE';
-    }, 2000);
-
-    console.log('Command executed with exit code:', exitCode);
-  } catch (error) {
-    console.error('Failed to execute command:', error);
-  }
-}
+  notifyRequiredSettings,
+  initializeStatusBarItems,
+} from './lib/userInterface';
+import configurationManager from './lib/configurationManager';
+import statusBarManager from './lib/statusBarManager';
+import fileLockManager from './lib/fileLockManager';
+import FileManagement from './lib/fileManagement';
+import FileWatcherCreator from './lib/fileWatcherCreator';
+import outputChannelManager from './lib/outputChannelManager';
+import FileContentStore from './lib/fileContentStore';
+import { CodeFileChangeHandler } from './lib/fileChangeHandlers/codeFileChangeHandler';
+import { JsonFileChangeHandler } from './lib/fileChangeHandlers/jsonFileChangeHandler';
+import { PoFileChangeHandler } from './lib/fileChangeHandlers/poFileChangeHandler';
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log('Activated Translation File Watcher Extension');
+  const fileWatcherCreator: FileWatcherCreator = new FileWatcherCreator();
 
-  initializeStatusBarIcons();
-  initializeConfigurationWatcher(context);
-
-  vscode.window.showInformationMessage(
-    'Activated Translation File Watcher Extension.'
+  outputChannelManager.appendLine(
+    'Activated Translation File Watcher Extension',
+    LogVerbosity.Important
   );
 
-  const packageJsonPath = await findPackageJson();
+  const myExtension = vscode.extensions.getExtension(
+    'qvotaxon.translation-file-watcher'
+  );
+  const currentVersion =
+    myExtension!.packageJSON.configurationVersion ?? '0.0.2';
+
+  const lastVersion = context.globalState.get(
+    'TranslationFileWatcherExtensionVersion'
+  );
+  if (currentVersion !== lastVersion) {
+    void context.globalState.update(
+      'TranslationFileWatcherExtensionVersion',
+      currentVersion
+    );
+    notifyRequiredSettings();
+  }
+
+  initializeStatusBarItems();
+  const enableVerboseLogging = configurationManager.getValue<boolean>(
+    'logging.enableVerboseLogging',
+    false
+  )!;
+  outputChannelManager.setVerboseLogging(enableVerboseLogging);
+  await configurationManager.initializeConfigurationWatcher(context);
+
+  const packageJsonPath = await FileManagement.getPackageJsonAbsolutePath();
   if (packageJsonPath) {
-    projectRootPath = path.dirname(packageJsonPath);
-    vscode.window.setStatusBarMessage(
-      `TFW: ${getLastThreeDirectories(
-        projectRootPath,
-        100
-      )} used as project directory.`,
-      7500
+    statusBarManager.setStatusBarItemCommand(
+      StatusBarItemType.PO,
+      'extension.poFileWatcherStatusBarItemClicked'
+    );
+    statusBarManager.setStatusBarItemCommand(
+      StatusBarItemType.JSON,
+      'extension.jsonFileWatcherStatusBarItemClicked'
+    );
+    statusBarManager.setStatusBarItemCommand(
+      StatusBarItemType.CODE,
+      'extension.codeFileWatcherStatusBarItemClicked'
+    );
+  } else {
+    statusBarManager.setStatusBarItemText(
+      StatusBarItemType.PO,
+      '$(eye-closed) PO'
+    );
+    statusBarManager.setStatusBarItemTooltip(
+      StatusBarItemType.PO,
+      'File watcher disabled because required configuration files could not be found.'
+    );
+    statusBarManager.setStatusBarItemText(
+      StatusBarItemType.JSON,
+      '$(eye-closed) JSON'
+    );
+    statusBarManager.setStatusBarItemTooltip(
+      StatusBarItemType.JSON,
+      'File watcher disabled because required configuration files could not be found.'
+    );
+    statusBarManager.setStatusBarItemText(
+      StatusBarItemType.CODE,
+      '$(eye-closed) CODE'
+    );
+    statusBarManager.setStatusBarItemTooltip(
+      StatusBarItemType.CODE,
+      'File watcher disabled because required configuration files could not be found.'
     );
   }
 
-  poFileWatcherStatusBarItem.show();
-  jsonFileWatcherStatusBarItem.show();
-  codeFileWatcherStatusBarItem.show();
+  statusBarManager.showStatusBarItem(StatusBarItemType.PO);
+  statusBarManager.showStatusBarItem(StatusBarItemType.JSON);
+  statusBarManager.showStatusBarItem(StatusBarItemType.CODE);
 
-  const poFileWatcher = createFileWatcher(
-    '**/locales/**/*.po',
-    handlePOFileChange,
-    isMasterLockEnabled,
-    arePoFilesLocked
+  /**
+   * TODO> Move to seperate function
+   */
+  let localesRelativePath = configurationManager.getValue<string>(
+    'filePaths.localesRelativePath'
+  );
+  if (localesRelativePath && packageJsonPath) {
+    const localesAbsolutePath = `${
+      vscode.workspace.workspaceFolders![0].uri.fsPath
+    }\\${localesRelativePath}`;
+
+    let poFileWatcherStatusBarItemClickedCommand =
+      vscode.commands.registerCommand(
+        'extension.poFileWatcherStatusBarItemClicked',
+        () => {
+          const jsonFileChangeHandler = new JsonFileChangeHandler();
+          jsonFileChangeHandler.processJSONFiles(localesAbsolutePath, false);
+          vscode.window.showInformationMessage('Generating PO files.');
+        }
+      );
+
+    let jsonFileWatcherStatusBarItemClickedCommand =
+      vscode.commands.registerCommand(
+        'extension.jsonFileWatcherStatusBarItemClicked',
+        () => {
+          const poFileChangeHandler = new PoFileChangeHandler();
+          poFileChangeHandler.processPOFiles(localesAbsolutePath, false);
+          vscode.window.showInformationMessage('Generating JSON files.');
+        }
+      );
+
+    let codeFileWatcherStatusBarItemClickedCommand =
+      vscode.commands.registerCommand(
+        'extension.codeFileWatcherStatusBarItemClicked',
+        async () => {
+          vscode.window.showInformationMessage('Generating JSON files.');
+
+          const codeFileChangeHandler = new CodeFileChangeHandler();
+          await codeFileChangeHandler.handleFileChangeAsync(
+            false,
+            undefined,
+            true
+          );
+        }
+      );
+
+    context.subscriptions.push(
+      poFileWatcherStatusBarItemClickedCommand,
+      jsonFileWatcherStatusBarItemClickedCommand,
+      codeFileWatcherStatusBarItemClickedCommand
+    );
+  }
+
+  const codeFileGlobPattern = '**/{apps,libs}/**/*.{tsx,ts}';
+  const poFileGlobPattern = `${localesRelativePath}/**/*.po`;
+  const jsonFileGlobPattern = `${localesRelativePath}/**/*.json`;
+
+  //TODO: use relativeLocalesPath to read po files from. Same for tsx ts files.
+  await FileContentStore.getInstance().initializeInitialFileContentsAsync(
+    codeFileGlobPattern
   );
 
-  const codeFileWatcher = createFileWatcher(
-    '**/{apps,libs}/**/*.{tsx,ts}',
-    handleCodeFileChange,
-    isMasterLockEnabled
-  );
-  const jsonFileWatcher = createFileWatcher(
-    '**/locales/**/*.json',
-    handleJsonFileChange,
-    isMasterLockEnabled
-  );
+  const poFileWatchers =
+    await fileWatcherCreator.createFileWatcherForEachFileInGlobAsync(
+      poFileGlobPattern,
+      fileLockManager.isMasterLockEnabled
+    );
+  const jsonFileWatchers =
+    await fileWatcherCreator.createFileWatcherForEachFileInGlobAsync(
+      jsonFileGlobPattern,
+      fileLockManager.isMasterLockEnabled
+    );
+  const codeFileWatcher =
+    await fileWatcherCreator.createSingleFileWatcherForGlobAsync(
+      codeFileGlobPattern,
+      fileLockManager.isMasterLockEnabled
+    );
 
-  context.subscriptions.push(poFileWatcher, codeFileWatcher, jsonFileWatcher);
+  context.subscriptions.push(
+    ...poFileWatchers,
+    ...jsonFileWatchers,
+    codeFileWatcher
+  );
 }
 
 vscode.commands.registerCommand(
   'translation-file-watcher.toggleFileWatchers',
   () => {
-    setMasterLock(!isMasterLockEnabled());
+    fileLockManager.setMasterLock(!fileLockManager.isMasterLockEnabled());
   }
 );
 
-function initializeStatusBarIcons() {
-  // if (!poFileWatcherStatusBarItem) {
-  poFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left
-  );
-  poFileWatcherStatusBarItem.text = '$(eye) PO';
-  poFileWatcherStatusBarItem.tooltip = 'Watching PO files';
-  // }
-  // if (!codeFileWatcherStatusBarItem) {
-  codeFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left
-  );
-  codeFileWatcherStatusBarItem.text = '$(eye) CODE';
-  codeFileWatcherStatusBarItem.tooltip = 'Watching code files';
-
-  // }
-  // if (!jsonFileWatcherStatusBarItem) {
-  jsonFileWatcherStatusBarItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left
-  );
-  jsonFileWatcherStatusBarItem.text = '$(eye) JSON';
-  jsonFileWatcherStatusBarItem.tooltip = 'Watching JSON files';
-  // }
-}
-
-function initializeConfigurationWatcher(context: vscode.ExtensionContext) {
-  vscode.workspace.onDidChangeConfiguration((event) => {
-    if (event.affectsConfiguration('translationFileWatcher')) {
-      vscode.window.showInformationMessage(
-        'Detected configuration change. Reinitalizing Translation File Watcher extension.'
-      );
-      deactivate();
-      activate(context);
-    }
-  });
-}
-
 export function deactivate() {
-  // Dispose of status bar items when the extension is deactivated
-  poFileWatcherStatusBarItem.dispose();
-  jsonFileWatcherStatusBarItem.dispose();
-  codeFileWatcherStatusBarItem.dispose();
+  statusBarManager.removeStatusBarItem(StatusBarItemType.PO);
+  statusBarManager.removeStatusBarItem(StatusBarItemType.JSON);
+  statusBarManager.removeStatusBarItem(StatusBarItemType.CODE);
 
-  console.log('Deactivated Translation File Watcher Extension');
+  outputChannelManager.appendLine(
+    'Deactivated Translation File Watcher Extension'
+  );
 }
