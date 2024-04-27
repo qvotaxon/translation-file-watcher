@@ -2,6 +2,7 @@
 
 !include style/sequence.style.iuml
 !include style/sequence.settings.iuml
+!include style/sequence.variables.iuml
 
 legend top left
   <#GhostWhite,#GhostWhite>|        |= __ESB Message Types__ |

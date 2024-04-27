@@ -1,7 +1,6 @@
 @startuml
-!include sequence.variables.iuml
 
-!theme cerulean-outline
+!include theme/theme-cerulean-outline.iuml
 
 skinparam defaultFontName Calibri
 skinparam defaultFontSize 20
