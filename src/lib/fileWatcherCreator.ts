@@ -8,22 +8,28 @@ class FileWatcherCreator {
     ...disableFlags: (() => boolean)[]
   ): Promise<vscode.FileSystemWatcher> => {
     return new Promise<vscode.FileSystemWatcher>((resolve, reject) => {
-      const fileWatcher = vscode.workspace.createFileSystemWatcher(pattern);
-      const fileChangeHandlerFactory = new FileChangeHandlerFactory();
+      try {
+        const fileWatcher = vscode.workspace.createFileSystemWatcher(pattern);
+        const fileChangeHandlerFactory = new FileChangeHandlerFactory();
 
-      outputChannelManager.appendLine(
-        `Activated File Watcher for: ${pattern.valueOf()}.`
-      );
-
-      fileWatcher.onDidChange(async (uri) => {
-        if (!disableFlags.some((disableFlag) => disableFlag())) {
-          const fileChangeHandler =
-            fileChangeHandlerFactory.createFileChangeHandler(uri.fsPath);
-          await fileChangeHandler?.handleFileChangeAsync(true, uri.fsPath);
+        if (typeof pattern === 'string') {
+          outputChannelManager.appendLine(
+            `Activated File Watcher for: ${pattern}.`
+          );
         }
-      });
 
-      resolve(fileWatcher);
+        fileWatcher.onDidChange(async (uri) => {
+          if (!disableFlags.some((disableFlag) => disableFlag())) {
+            const fileChangeHandler =
+              fileChangeHandlerFactory.createFileChangeHandler(uri.fsPath);
+            await fileChangeHandler?.handleFileChangeAsync(true, uri.fsPath);
+          }
+        });
+
+        resolve(fileWatcher);
+      } catch (error) {
+        reject(new Error(error as string));
+      }
     });
   };
 
