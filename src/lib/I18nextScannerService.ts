@@ -34,9 +34,10 @@ class I18nextScannerService {
     const packageJsonAbsoluteFolderPath = path.dirname(
       packageJsonFileAbsolutePath!
     );
+
     //TODO: Fix path to run on all os's
     const fixedPackageJsonAbsoluteFolderPath = StringUtils.replaceAll(
-      packageJsonAbsoluteFolderPath!,
+      packageJsonAbsoluteFolderPath,
       '\\',
       '/'
     );
@@ -96,7 +97,7 @@ class StringUtils {
   // SiwachGaurav's version from http://stackoverflow.com/questions/1144783/replacing-all-occurrences-of-a-string-in-javascript
   static replaceAll(str: string, find: string, replace: string): string {
     return str.replace(
-      new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'),
+      new RegExp(find.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'),
       replace
     );
   }
