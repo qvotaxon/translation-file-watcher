@@ -2,15 +2,27 @@ import * as vscode from 'vscode';
 import outputChannelManager from './outputChannelManager';
 import statusBarManager from './statusBarManager';
 import { StatusBarItemType } from './enums/statusBarItemType';
+import { UserInterfaceManager } from './userInterface';
 
-class ConfigurationManager {
+/**
+ * A class to manage extension configuration settings and related functionality.
+ */
+export class ConfigurationManager {
   private static instance: ConfigurationManager;
   private config: vscode.WorkspaceConfiguration;
 
+  /**
+   * Constructs a new instance of ConfigurationManager.
+   * Private to enforce singleton pattern.
+   */
   private constructor() {
     this.config = vscode.workspace.getConfiguration('translationFileWatcher');
   }
 
+  /**
+   * Gets the singleton instance of ConfigurationManager.
+   * @returns The singleton instance of ConfigurationManager.
+   */
   public static getInstance(): ConfigurationManager {
     if (!ConfigurationManager.instance) {
       ConfigurationManager.instance = new ConfigurationManager();
@@ -18,34 +30,42 @@ class ConfigurationManager {
     return ConfigurationManager.instance;
   }
 
-  public async updateSynchronizedOptions(value: string) {
-    await this.config.update(
-      'fileModes.poFileMode',
-      value,
-      vscode.ConfigurationTarget.Global
-    );
-    await this.config.update(
-      'fileModes.jsonFileMode',
-      value,
-      vscode.ConfigurationTarget.Global
-    );
-    await this.config.update(
-      'fileModes.codeFileMode',
-      value,
-      vscode.ConfigurationTarget.Global
-    );
-  }
-
-  public async initializeConfigurationWatcher(
+  /**
+   * Notifies the user if the configuration version has changed.
+   * @param context The extension context.
+   */
+  public notifyUserIfConfigurationVersionHasChanged(
     context: vscode.ExtensionContext
   ) {
+    const myExtension = vscode.extensions.getExtension(
+      'qvotaxon.translation-file-watcher'
+    );
+    const currentVersion =
+      myExtension?.packageJSON.configurationVersion ?? '0.0.2';
+    const lastVersion = context.globalState.get(
+      'TranslationFileWatcherExtensionVersion'
+    );
+
+    if (currentVersion !== lastVersion) {
+      void context.globalState.update(
+        'TranslationFileWatcherExtensionVersion',
+        currentVersion
+      );
+      UserInterfaceManager.notifyRequiredSettings();
+    }
+  }
+
+  /**
+   * Initializes the configuration watcher to react to configuration changes.
+   */
+  public initializeConfigurationWatcher() {
     vscode.workspace.onDidChangeConfiguration(async (event) => {
       if (
         event.affectsConfiguration(
           'translationFileWatcher.logging.enableVerboseLogging'
         )
       ) {
-        const newValue = configurationManager.getValue<boolean>(
+        const newValue = this.getValue<boolean>(
           'logging.enableVerboseLogging',
           false
         )!;
@@ -85,15 +105,19 @@ class ConfigurationManager {
     });
   }
 
+  /**
+   * Retrieves the value of a configuration setting.
+   * @param configurationKey The key of the configuration setting.
+   * @param defaultValue The default value to return if the setting is not found.
+   * @returns The value of the configuration setting, or undefined if not found.
+   */
   public getValue<T>(
     configurationKey: string,
     defaultValue?: T
   ): T | undefined {
-    if (defaultValue) {
-      return this.config.get<T>(configurationKey, defaultValue);
-    }
-
-    return this.config.get<T>(configurationKey);
+    return defaultValue
+      ? this.config.get<T>(configurationKey, defaultValue)
+      : this.config.get<T>(configurationKey);
   }
 }
 
