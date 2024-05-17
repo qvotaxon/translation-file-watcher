@@ -1,4 +1,4 @@
-@startuml Extension Initialization Sequence
+@startuml Extension Initialization Sequence - Updated
 
 !include style/sequence.style.iuml
 !include style/sequence.settings.iuml
