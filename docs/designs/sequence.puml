@@ -1,4 +1,4 @@
-@startuml Extension Initialization Sequence - Updated
+@startuml Extension Initialization Sequence
 
 !include style/sequence.style.iuml
 !include style/sequence.settings.iuml
@@ -10,7 +10,7 @@ legend top left
   |<$asyncColor>  | Async|
 endlegend
 
-title Extension Initialization Sequence
+title Extension Initialization Sequence - Updated
 
 !define X "Extension"
 !define OPCMNG "OutputChannelManager"
