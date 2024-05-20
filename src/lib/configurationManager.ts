@@ -41,7 +41,7 @@ export class ConfigurationManager {
       'qvotaxon.translation-file-watcher'
     );
     const currentVersion =
-      myExtension?.packageJSON.configurationVersion ?? '0.0.2';
+      myExtension?.packageJSON.configurationVersion ?? '0.0.3';
     const lastVersion = context.globalState.get(
       'TranslationFileWatcherExtensionVersion'
     );
