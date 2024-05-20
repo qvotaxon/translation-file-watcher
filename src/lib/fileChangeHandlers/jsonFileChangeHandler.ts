@@ -69,11 +69,14 @@ export class JsonFileChangeHandler implements FileChangeHandler {
 
     const json = await FileUtilities.readFileContentsAsync(changeFileLocation);
 
-    translationService.translateOtherI18nFiles(
-      changeFileLocation,
-      locale,
-      json
-    );
+    // const shouldAutoGenerateMissingTranslations =
+    //   configurationManager.getValue<boolean>(
+    //     'translations.autoGenerateMissingTranslations',
+    //     true
+    //   );
+    // if (shouldAutoGenerateMissingTranslations) {
+    translationService.translateOtherI18nFiles(changeFileLocation, json);
+    // }
 
     const res = i18next2po(locale, json, { compatibilityJSON: 'v3' });
     await FileUtilities.writeToFileAsync(poOutputPath, res);
