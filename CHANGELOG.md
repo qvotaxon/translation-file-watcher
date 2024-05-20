@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.15.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.14.0...v1.15.0) (2024-05-20)
+
+
+### Features
+
+* add automatic translation functionality ([674866b](https://github.com/qvotaxon/translation-file-watcher/commit/674866bd11a09eda7dec2b5327115ea2d8f73d93))
+* add automatic translation functionality ([#109](https://github.com/qvotaxon/translation-file-watcher/issues/109)) ([674866b](https://github.com/qvotaxon/translation-file-watcher/commit/674866bd11a09eda7dec2b5327115ea2d8f73d93))
+* move sequence diagram to diagrams folder ([1ba755e](https://github.com/qvotaxon/translation-file-watcher/commit/1ba755eee862eff3dcb8a8f76bd5ab9c4303cb64))
+
 ## [1.14.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.13.2...v1.14.0) (2024-04-27)
 
 
