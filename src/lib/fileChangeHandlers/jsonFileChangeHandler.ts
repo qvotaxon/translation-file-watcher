@@ -12,6 +12,7 @@ import outputChannelManager from '../outputChannelManager';
 import statusBarManager from '../statusBarManager';
 import { FileChangeHandlerFactory } from '../fileChangeHandlerFactory';
 import { CallbackOnMatch } from '../types/callbackOnMatch';
+import translationService from '../translationService';
 
 export class JsonFileChangeHandler implements FileChangeHandler {
   private fileChangeHandlerFactory: FileChangeHandlerFactory;
@@ -67,6 +68,13 @@ export class JsonFileChangeHandler implements FileChangeHandler {
     fileLockManager.addFileLock(changeFileLocation);
 
     const json = await FileUtilities.readFileContentsAsync(changeFileLocation);
+
+    translationService.translateOtherI18nFiles(
+      changeFileLocation,
+      locale,
+      json
+    );
+
     const res = i18next2po(locale, json, { compatibilityJSON: 'v3' });
     await FileUtilities.writeToFileAsync(poOutputPath, res);
 
