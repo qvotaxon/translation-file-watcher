@@ -16,6 +16,8 @@ title Extension Initialization Sequence - Updated
 !define OPCMNG "OutputChannelManager"
 !define CNFMNG "ConfigurationManager"
 !define FCS "FileContentStore"
+!define FWM "FileWatcherManager"
+!define SBM "StatusBarManager"
 
 !define VSCAPI "VS Code API"
 
@@ -24,6 +26,8 @@ box "Internal Logic" $internalServicesBoxColor
     participant OPCMNG   << (S,#ADD1B2) Singleton >>
     participant CNFMNG   << (S,#ADD1B2) Singleton >>
     participant FCS      << (S,#ADD1B2) Singleton >>
+    participant FWM      << (S,#ADD1B2) Singleton >>
+    participant SBM      << (S,#ADD1B2) Singleton >>
 end box
 
 box "External Logic" $externalServicesBoxColor
@@ -42,12 +46,21 @@ return
 CNFMNG->CNFMNG:initializeConfigurationWatchers()
 return
 return
+X->SBM:initializeStatusBar()
+return
 X->FCS:initializeFileContentStore()
 FCS->VSCAPI:workspace.findFiles
 return
 return
+X->FWM:initializeFileWatchers()
+loop for each file watcher type
+  FWM->SBM:updateStatusBarItem()
+  return
+end
+return
+return
 === DEACTIVATION ===
 ->>X:<<event>>dectivate()
-
+return
 
 @enduml
