@@ -1,5 +1,6 @@
 <!-- ![Logo](./logo.jpg)
 <small>Generated using CoPilot</small> -->
+
 ![Downloads](https://img.shields.io/visual-studio-marketplace/d/qvotaxon.translation-file-watcher.png?logo=github&branch=main)
 [![Code Size](https://img.shields.io/github/languages/code-size/qvotaxon/translation-file-watcher.png?logo=github&branch=main)](https://github.com/qvotaxon/translation-file-watcher/releases)
 ![Visual Studio Code](https://img.shields.io/badge/VS%20Code-^1.61.0-blue.png?logo=github&branch=main)
@@ -14,7 +15,6 @@
 [![License](https://img.shields.io/github/license/qvotaxon/translation-file-watcher.png?logo=github)](https://github.com/qvotaxon/translation-file-watcher/releases)
 
 <!-- [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_shield) -->
-
 
 # Translation File Watcher
 
@@ -38,6 +38,7 @@ TODO:
 - **PO File Support**: Optionally utilize PO files for translation management, allowing for seamless integration with existing localization workflows.
 - **PO to i18n-next JSON Conversion**: Convert PO files to i18n-next JSON format effortlessly, facilitating compatibility with various localization tools and libraries.
 - **i18n-next JSON to PO Conversion**: Convert i18n-next JSON files back to PO format with ease.
+- **Automatic Translations**: Automatically generate translations for all locales when adding a translation for one locale. (Currently uses [DeepL](https://www.deepl.com/translator))
 
 ### Modes
 
@@ -78,9 +79,9 @@ TODO
 
 ## 👍 Acknowledgements
 
-This extension leans heaviliy on the following two libraries.
+This extension leans on at least the following libraries / packages.
 
-- [i18next-gettext-converter](https://github.com/i18next/i18next-gettext-converter)
+- [gettext-converter](https://github.com/locize/gettext-converter)
 - [i18next-scanner](https://github.com/i18next/i18next-scanner)
 
 ## 🤓 Authors
