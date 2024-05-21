@@ -1,6 +1,7 @@
 import fs from 'fs';
 import * as deepl from 'deepl-node';
 import configurationManager from './configurationManager';
+import outputChannelManager from './outputChannelManager';
 
 class TranslationService {
   private static instance: TranslationService;
@@ -19,7 +20,7 @@ class TranslationService {
   private getTranslator = (): deepl.Translator => {
     const authKey =
       this.authKey ||
-      configurationManager.getValue<string>('translations.deepLApiKey');
+      configurationManager.getValue<string>('translations.deeplApiKey');
 
     if (!authKey) {
       throw new Error('No DeepL API key found in the configuration.');
@@ -119,13 +120,37 @@ class TranslationService {
             targetLanguage = 'en-US';
           }
 
+          const formality = configurationManager.getValue<string>(
+            'translations.deeplFormality',
+            'default'
+          );
+          outputChannelManager.appendLine(
+            `formality from config: ${formality}`
+          );
+          const preserveFormatting = configurationManager.getValue<boolean>(
+            'translations.deeplPreserveFormatting',
+            false
+          );
+
           const result = await this.getTranslator().translateText(
             text,
             null,
-            targetLanguage as deepl.TargetLanguageCode
+            targetLanguage as deepl.TargetLanguageCode,
+            {
+              formality: (formality as deepl.Formality) ?? 'default',
+              preserveFormatting: preserveFormatting ?? false,
+            }
           );
-          console.log(
+          outputChannelManager.appendLine(
             `Determined source language to be: ${result.detectedSourceLang}`
+          );
+          outputChannelManager.appendLine(
+            `Using ${
+              formality as deepl.Formality
+            } as formality level for translation.`
+          );
+          outputChannelManager.appendLine(
+            `Preserving formatting: ${preserveFormatting}.`
           );
 
           return result.text;
