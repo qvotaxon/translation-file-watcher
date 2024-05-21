@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.15.0...v1.16.0) (2024-05-21)
+
+
+### Features
+
+* implement deepl formality and preserve formatting options ([#110](https://github.com/qvotaxon/translation-file-watcher/issues/110)) ([6ae36ed](https://github.com/qvotaxon/translation-file-watcher/commit/6ae36ed4ca3f38f0603ed30258143ae7f89c9fb5))
+
 ## [1.15.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.14.0...v1.15.0) (2024-05-20)
 
 
