@@ -8,7 +8,7 @@
     "url": "https://github.com/qvotaxon/translation-file-watcher"
   },
   "version": "1.15.0",
-  "configurationVersion": "0.0.4",
+  "configurationVersion": "0.0.5",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -48,23 +48,41 @@
       },
       {
         "id": "translations",
-        "title": "Auto-Generate Missing Translations",
+        "title": "DeepL API",
         "properties": {
+          "translationFileWatcher.translations.deeplApiKey": {
+            "type": "string",
+            "default": "",
+            "description": "Your deepLApiKey."
+          },
+          "translationFileWatcher.translations.deeplFormality": {
+            "type": "string",
+            "default": "default",
+            "enum": [
+              "default",
+              "more",
+              "less",
+              "prefer_more",
+              "prefer_less"
+            ],
+            "enumDescriptions": [
+              "The DeepL default",
+              "For a more formal language",
+              "For a more informal language",
+              "For a more formal language if available, otherwise fallback to default formality",
+              "For a more informal language if available, otherwise fallback to default formality"
+            ],
+            "description": "Specify the formality preference for translations."
+          },
+          "translationFileWatcher.translations.deeplPreserveFormatting": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Preserve formatting in translations. This will prevent DeepL from changing the formatting of the translation. This is useful for translations that contain code or other formatting that should not be changed."
+          },
           "translationFileWatcher.translations.autoGenerateMissingTranslations": {
             "type": "boolean",
             "default": false,
             "description": "Automatically generate missing translations in i18n files when a new translation value is saved in any i18n file."
-          }
-        }
-      },
-      {
-        "id": "translations",
-        "title": "DeepL API Key",
-        "properties": {
-          "translationFileWatcher.translations.deepLApiKey": {
-            "type": "string",
-            "default": "",
-            "description": "Your deepLApiKey."
           }
         }
       },

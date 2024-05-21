@@ -30,6 +30,10 @@ export class ConfigurationManager {
     return ConfigurationManager.instance;
   }
 
+  private reinitConfiguration() {
+    this.config = vscode.workspace.getConfiguration('translationFileWatcher');
+  }
+
   /**
    * Notifies the user if the configuration version has changed.
    * @param context The extension context.
@@ -41,7 +45,7 @@ export class ConfigurationManager {
       'qvotaxon.translation-file-watcher'
     );
     const currentVersion =
-      myExtension?.packageJSON.configurationVersion ?? '0.0.3';
+      myExtension?.packageJSON.configurationVersion ?? '0.0.4';
     const lastVersion = context.globalState.get(
       'TranslationFileWatcherExtensionVersion'
     );
@@ -60,6 +64,10 @@ export class ConfigurationManager {
    */
   public initializeConfigurationWatcher() {
     vscode.workspace.onDidChangeConfiguration(async (event) => {
+      if (event.affectsConfiguration('translationFileWatcher')) {
+        this.reinitConfiguration();
+      }
+
       if (
         event.affectsConfiguration(
           'translationFileWatcher.logging.enableVerboseLogging'
