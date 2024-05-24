@@ -116,11 +116,7 @@ class TranslationService {
           text: string,
           targetLanguage: string
         ): Promise<string> => {
-          if (targetLanguage === 'en') {
-            targetLanguage = 'en-US';
-          }
-
-          const formality = configurationManager.getValue<string>(
+          let formality = configurationManager.getValue<string>(
             'translations.deeplFormality',
             'default'
           );
@@ -131,6 +127,11 @@ class TranslationService {
             'translations.deeplPreserveFormatting',
             false
           );
+
+          if (targetLanguage === 'en') {
+            targetLanguage = 'en-US';
+            formality = 'default';
+          }
 
           const result = await this.getTranslator().translateText(
             text,
