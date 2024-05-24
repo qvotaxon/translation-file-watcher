@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/qvotaxon/translation-file-watcher/compare/v1.16.0...v1.16.1) (2024-05-24)
+
+
+### Bug Fixes
+
+* disable formality for en target language ([#112](https://github.com/qvotaxon/translation-file-watcher/issues/112)) ([9859b5f](https://github.com/qvotaxon/translation-file-watcher/commit/9859b5f56cb4c09d875b7e298a613707c0794c5f))
+
 ## [1.16.0](https://github.com/qvotaxon/translation-file-watcher/compare/v1.15.0...v1.16.0) (2024-05-21)
 
 
