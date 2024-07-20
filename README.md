@@ -16,6 +16,14 @@
 
 <!-- [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqvotaxon%2Ftranslation-file-watcher?ref=badge_shield) -->
 
+<span style="color:orange;">
+  
+# Archived and Unmaintained
+
+**Please have a look at [i18nWeave](https://github.com/qvotaxon/i18nWeave-vscode) as the official replacement for this extension.**
+
+</span>
+
 # Translation File Watcher
 
 <span style="color:orange;">**Note**: This extension is still under development and should be used with that assumption.</span>
